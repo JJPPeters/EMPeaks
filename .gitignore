@@ -1,0 +1,5 @@
+*.pyd
+*.c
+*.user
+.idea
+__pycache__

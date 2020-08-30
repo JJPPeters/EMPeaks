@@ -1,0 +1,1 @@
+from .image_info_widget import ImageInfoWidget
