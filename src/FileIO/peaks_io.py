@@ -10,5 +10,6 @@ def ImportPeaks(file_path):
     peaks = np.fliplr(peaks)
     return peaks
 
+
 def ExportPeaks(file_path, peaks):
     np.savetxt(file_path, np.fliplr(peaks), delimiter=",", header="x,y")

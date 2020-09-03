@@ -6,6 +6,7 @@ import numpy as np
 
 from GUI.Utilities.enums import ImageType, WindowType, AnnotationType
 from Processing.Utilities.peak_functions import gaussian_2d
+from GUI.Utilities import save_peaks, save_quiver
 
 from GUI.Controls.Plot.Plottables import ImagePlot, PolarImagePlot
 
@@ -70,6 +71,9 @@ class ImageInfoWidget(QtWidgets.QWidget):
         if len(items) == 1 and items[0].text(2) == AnnotationType.Scatter.value:
             action_export = menu.addAction(self.tr("Export"))
             action_export.triggered.connect(lambda: self.peaks_export_triggered(items))
+        elif len(items) == 1 and items[0].text(2) == AnnotationType.Quiver.value:
+            action_export = menu.addAction(self.tr("Export"))
+            action_export.triggered.connect(lambda: self.quiver_export_triggered(items))
 
         action_delete = menu.addAction(self.tr("Delete"))
         action_delete.triggered.connect(lambda: self.on_actionDelete_triggered(items))
@@ -79,7 +83,12 @@ class ImageInfoWidget(QtWidgets.QWidget):
         menu.exec_(pos)
 
     def peaks_export_triggered(self, item):
-        self.parent.ui.menu_file.on_action_export_peaks_triggered(tag=item[0].text(1))
+        tag = item[0].text(1)
+        save_peaks(self.parent, tag)
+
+    def quiver_export_triggered(self, item):
+        tag = item[0].text(1)
+        save_quiver(self.parent, tag)
 
     def on_actionDelete_triggered(self, items):
         # column 0 is the name of the item, column 1 is the type

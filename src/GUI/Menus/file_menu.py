@@ -1,5 +1,4 @@
 import os
-import time
 
 from PyQt5 import QtGui, QtWidgets
 import numpy as np
@@ -11,6 +10,7 @@ from Processing.Utilities import LatticeBasis
 from GUI.Controls.Plot.Plottables import Basis
 #
 
+from GUI.Utilities import save_peaks
 from FileIO import ImportPeaks, ExportPeaks, ImportImage, ExportImage, ExportRGB
 from GUI.Dialogs import ProcessSettingsDialog
 import GUI
@@ -158,21 +158,7 @@ class FileMenu(MenuEntry):
         self.master.last_active.add_plottable(tag, scatter)
 
     def on_action_export_peaks_triggered(self, tag, fpath=None):
-        if not self.master.image_requirements_met():
-            return
-
-        if tag in self.master.last_active.plottables:
-            if fpath is None:
-                ext_list = [('Comma separated values', '.csv'), ('Text', '.txt')]
-                title = os.path.splitext(self.master.last_active.name)[0] + '_peaks'
-
-                fpath = save_file_helper(self, "Save data", os.path.join(self.master.last_directory, title), ext_list)
-
-            if fpath is None or fpath == '':
-                return
-
-            ExportPeaks(fpath, self.master.last_active.plottables[tag].points)
-            self.master.save_settings(os.path.dirname(fpath))
+        save_peaks(self.master, tag, fpath)
 
     def on_action_save_workspace(self):
         if not self.master.image_requirements_met():

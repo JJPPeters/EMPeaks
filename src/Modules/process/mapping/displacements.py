@@ -234,80 +234,80 @@ class DisplacementField(MenuEntryModule):
                 self.main_window.Children[im_id] = self.new_window
 
 
-class DisplacementExport(MenuEntryModule):
-    def __init__(self):
-        self.menu_structure = base_path
-        self.name = 'Export'
-        self.order_priority = 0
-
-    def run(self):
-        if not self.main_window.image_requirements_met():
-            return
-
-        # if not self.main_window.last_active.haveScatter(2):
-        #     return
-
-        default = 0
-
-        items = []
-        for key, entry in self.main_window.last_active.plottables.items():
-            if entry.plot_type == AnnotationType.Scatter:
-                items.append(key)
-
-        try:
-            ref_index = items.index('sub0')
-        except ValueError:
-            ref_index = default
-            default += 1
-
-        try:
-            disp_index = items.index('sub1')
-        except ValueError:
-            disp_index = default
-
-        ref_combo = ["ListSelect", 0, "Reference", items, [ref_index]]
-        disp_combo = ["ListSelect", 1, "Displacement", items, [disp_index]]
-        average_spin = ["SpinInt", 2, "Average neighbours", (0, 100, 1, 0)]
-        neighbours_spin = ["SpinInt", 3, "Neighbours", (2, 20, 1, 4)]
-
-        filterdialog = ProcessSettingsDialog(master=self.main_window.last_active,
-                                             name="Map",
-                                             function=self.do_displacement_vectors,
-                                             inputs=[ref_combo,
-                                            disp_combo,
-                                            average_spin,
-                                            neighbours_spin],
-                                             show_preview=False)
-        filterdialog.exec_()
-
-    def do_displacement_export(self, params):
-        # image = params[0]
-        vals = params
-
-        ref_col = vals["Reference"]
-        disp_col = vals["Displacement"]
-        average = vals["Average neighbours"]
-        neighbours = vals["Neighbours"]
-
-        ref_list = [self.main_window.last_active.plottables[x].points for x in ref_col]
-        disp_list = [self.main_window.last_active.plottables[x].points for x in disp_col]
-
-        ref_peaks = np.concatenate(ref_list, axis=0)
-        disp_peaks = np.concatenate(disp_list, axis=0)
-
-        if ref_peaks is None or disp_peaks is None:
-            return
-
-        position, displacement = abo_displacement(ref_peaks, disp_peaks, neighbours, average=average)
-
-        title = os.path.splitext(self.main_window.last_active.name)[0]
-        fpath = QtGui.QFileDialog.getSaveFileName(
-            self, "Save file", os.path.join(self.main_window.last_directory, title) + "_displacements",
-            "Comma separated values (*.csv);;Text (*.txt)")
-        fpath = fpath[0]
-
-        if fpath == "":
-            return
-
-        np.savetxt(fpath, np.hstack((np.fliplr(position), np.fliplr(displacement))),
-                   delimiter=",", header="x,y,dx,dy")
+# class DisplacementExport(MenuEntryModule):
+#     def __init__(self):
+#         self.menu_structure = base_path
+#         self.name = 'Export'
+#         self.order_priority = 0
+#
+#     def run(self):
+#         if not self.main_window.image_requirements_met():
+#             return
+#
+#         # if not self.main_window.last_active.haveScatter(2):
+#         #     return
+#
+#         default = 0
+#
+#         items = []
+#         for key, entry in self.main_window.last_active.plottables.items():
+#             if entry.plot_type == AnnotationType.Scatter:
+#                 items.append(key)
+#
+#         try:
+#             ref_index = items.index('sub0')
+#         except ValueError:
+#             ref_index = default
+#             default += 1
+#
+#         try:
+#             disp_index = items.index('sub1')
+#         except ValueError:
+#             disp_index = default
+#
+#         ref_combo = ["ListSelect", 0, "Reference", items, [ref_index]]
+#         disp_combo = ["ListSelect", 1, "Displacement", items, [disp_index]]
+#         average_spin = ["SpinInt", 2, "Average neighbours", (0, 100, 1, 0)]
+#         neighbours_spin = ["SpinInt", 3, "Neighbours", (2, 20, 1, 4)]
+#
+#         filterdialog = ProcessSettingsDialog(master=self.main_window.last_active,
+#                                              name="Map",
+#                                              function=self.do_displacement_export,
+#                                              inputs=[ref_combo,
+#                                             disp_combo,
+#                                             average_spin,
+#                                             neighbours_spin],
+#                                              show_preview=False)
+#         filterdialog.exec_()
+#
+#     def do_displacement_export(self, params):
+#         # image = params[0]
+#         vals = params
+#
+#         ref_col = vals["Reference"]
+#         disp_col = vals["Displacement"]
+#         average = vals["Average neighbours"]
+#         neighbours = vals["Neighbours"]
+#
+#         ref_list = [self.main_window.last_active.plottables[x].points for x in ref_col]
+#         disp_list = [self.main_window.last_active.plottables[x].points for x in disp_col]
+#
+#         ref_peaks = np.concatenate(ref_list, axis=0)
+#         disp_peaks = np.concatenate(disp_list, axis=0)
+#
+#         if ref_peaks is None or disp_peaks is None:
+#             return
+#
+#         position, displacement = abo_displacement(ref_peaks, disp_peaks, neighbours, average=average)
+#
+#         title = os.path.splitext(self.main_window.last_active.name)[0]
+#         fpath = QtGui.QFileDialog.getSaveFileName(
+#             self, "Save file", os.path.join(self.main_window.last_directory, title) + "_displacements",
+#             "Comma separated values (*.csv);;Text (*.txt)")
+#         fpath = fpath[0]
+#
+#         if fpath == "":
+#             return
+#
+#         np.savetxt(fpath, np.hstack((np.fliplr(position), np.fliplr(displacement))),
+#                    delimiter=",", header="x,y,dx,dy")
