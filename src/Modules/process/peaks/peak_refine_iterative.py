@@ -127,7 +127,7 @@ class RefinePearsonVii(MenuEntryModule):
             name="Pearson VII",
             function=lambda p: self.do_refine_pearsonvii_iterative(p, tag),
             inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method],
-            show_preview=True, show_apply=False, preserve_peaks=True)
+            show_preview=False, show_apply=False, preserve_peaks=True)
 
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
@@ -174,7 +174,7 @@ class RefineVoigt(MenuEntryModule):
             name="Pearson VII iterative",
             function=lambda p: self.do_refine_pseudo_voigt_iterative(p, tag),
             inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method],
-            show_preview=True, show_apply=False, preserve_image=True)
+            show_preview=False, show_apply=False, preserve_image=True)
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_pseudo_voigt_iterative(self, params, tag):
