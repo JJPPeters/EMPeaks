@@ -84,9 +84,9 @@ class RefineMaximum(MenuEntryModule):
 
         self.main_window.set_console_message("Refined peaks to nearest maximum in %0.5fs (%d didn't refine, %d moved outside"
                                         "the limits and %d were removed from edges)" % (time.time() - start_time,
-                                                                                        stats[2],
                                                                                         stats[1],
-                                                                                        stats[3]),
+                                                                                        stats[0],
+                                                                                        stats[2]),
                                         Console.Message)
         
 
@@ -128,9 +128,9 @@ class RefineInterpolate(MenuEntryModule):
         self.main_window.set_console_message("Refined peaks using interpolation in %0.5fs (%d didn't "
                                         "refine, %d moved outside the limits and %d were removed from edges)"
                                         % (time.time() - start_time,
-                                           stats[2],
                                            stats[1],
-                                           stats[3]),
+                                           stats[0],
+                                           stats[2]),
                                         Console.Message)
 
 
@@ -171,7 +171,7 @@ class RefineParabola(MenuEntryModule):
         self.main_window.set_console_message("Refined peaks using parabolae in %0.5fs (%d didn't "
                                         "refine, %d moved outside the limits and %d were removed from edges)"
                                         % (time.time() - start_time,
-                                           stats[2],
                                            stats[1],
-                                           stats[3]),
+                                           stats[0],
+                                           stats[2]),
                                         Console.Message)
