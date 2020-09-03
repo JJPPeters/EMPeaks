@@ -39,7 +39,7 @@ class RefineGaussian(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_gaussian_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.image_data
+        image = self.active_image_window.image_plot.intensities
         v = params
 
         new_points = do_fitting_gauss(image, self.active_image_window.plottables[tag].points,
@@ -85,7 +85,7 @@ class RefineLorentzian(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_lorentzian_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.image_data
+        image = self.active_image_window.image_plot.intensities
         v = params
 
         new_points = do_fitting_lorentz(image, self.active_image_window.plottables[tag].points,
@@ -132,7 +132,7 @@ class RefinePearsonVii(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_pearsonvii_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.image_data
+        image = self.active_image_window.image_plot.intensities
         v = params
 
         new_points = do_fitting_pearson_vii(image, self.active_image_window.plottables[tag].points,
@@ -178,7 +178,7 @@ class RefineVoigt(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_pseudo_voigt_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.image_data
+        image = self.active_image_window.image_plot.intensities
         v = params
 
         new_points = do_fitting_voigt(image, self.active_image_window.plottables[tag].points,
