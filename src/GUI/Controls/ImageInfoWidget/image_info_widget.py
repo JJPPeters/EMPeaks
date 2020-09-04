@@ -162,7 +162,7 @@ class ImageInfoWidget(QtWidgets.QWidget):
             sz = 16
             params = [0.0, 0.0, 1, 2, 2.0, 0.0]
             YX = np.mgrid[0:sz, 0:sz] - (sz - 1) / 2
-            im = (gaussian_2d(YX, *params, do_ravel=False) * 255).astype(np.uint8)
+            im = (gaussian_2d(YX, *params) * 255).astype(np.uint8)
 
             qim = QtGui.QImage(im, sz, sz, QtGui.QImage.Format_Grayscale8)
 

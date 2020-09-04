@@ -26,7 +26,6 @@ def detect_local_maxima(img, min_dist=0, thresh=0.0):
     return peaks
 
 
-
 # def detect_local_maxima(arr):
 #     neighborhood = ndimage.generate_binary_structure(len(arr.shape), 2)
 #     local_max = (ndimage.maximum_filter(arr, footprint=neighborhood) == arr)
@@ -38,6 +37,7 @@ def detect_local_maxima(img, min_dist=0, thresh=0.0):
 #     tup[0].shape = (tup[0].size, 1)
 #     tup[1].shape = (tup[1].size, 1)
 #     return np.column_stack(tup)
+
 
 def average_nearby_peaks(data, ps, r=5):
     # make these now, they won't be all used, but they will be bigger than the output so can just crop

@@ -3,7 +3,7 @@ from GUI.Dialogs.process_settings_dialog import ProcessSettingsDialog
 from GUI.Controls.ProcessSettingsFrame import ProcessSettingsFrame
 import numpy as np
 import time
-from Processing.Peaks import do_interp, do_centroid, do_parabola, do_maximum
+from Processing.Peaks.Refinement import do_interp, do_centroid, do_parabola, do_maximum
 from GUI.Utilities.enums import Console
 from GUI import ImageWindow
 

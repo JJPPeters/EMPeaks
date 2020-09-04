@@ -1,5 +1,27 @@
 import numpy as np
 
+#
+# These functions just call the functions below, but are set up to work for least squares fitting
+#
+
+def gaussian_2d_fitting(yx, yo, xo, amplitude, sigma_x, sigma_y, theta, offset):
+    gauss = gaussian_2d(yx, yo, xo, amplitude, sigma_x, sigma_y, theta, offset)
+    return gauss.ravel()
+
+
+def lorentz_2d_fitting(yx, yo, xo, amplitude, gamma_x, gamma_y, theta, offset):
+    lorentz = lorentz_2d(yx, yo, xo, amplitude, gamma_x, gamma_y, theta, offset)
+    return lorentz.ravel()
+
+
+def pearson_vii_2d_fitting(yx, yo, xo, amplitude, m, w_x, w_y, theta, offset):
+    pearson = pearson_vii_2d(yx, yo, xo, amplitude, m, w_x, w_y, theta, offset)
+    return pearson.ravel()
+
+
+def pseudo_voigt_2d_fitting(yx, yo, xo, amplitude, frac, sigma_x, sigma_y, gamma_x, gamma_y, theta, offset):
+    voigt = pseudo_voigt_2d(yx, yo, xo, amplitude, frac, sigma_x, sigma_y, gamma_x, gamma_y, theta, offset)
+    return voigt.ravel()
 
 ########################################################################################################################
 # gaussian_2d
@@ -15,10 +37,11 @@ import numpy as np
 # theta - rotation of the peak
 # offset - baseline of peak
 # do_ravel - return output as list like (for curve_fit)
+# use_background - toggles using offset (only used for keeping background from generic fitting functions)
 ########################################################################################################################
 # https://stackoverflow.com/questions/21566379/fitting-a-2d-gaussian-function-using-scipy-optimize-curve-fit-valueerror-and-m
 ########################################################################################################################
-def gaussian_2d(yx, yo, xo, amplitude, sigma_x, sigma_y, theta=0.0, offset=0.0, do_ravel=True):
+def gaussian_2d(yx, yo, xo, amplitude, sigma_x, sigma_y, theta=0.0, offset=0.0):
     x = yx[1]
     y = yx[0]
 
@@ -30,16 +53,11 @@ def gaussian_2d(yx, yo, xo, amplitude, sigma_x, sigma_y, theta=0.0, offset=0.0, 
     b = -sn2 / (4 * sigma_x**2) + sn2 / (4 * sigma_y**2)
     c = sn**2 / (2 * sigma_x**2) + cs**2 / (2 * sigma_y**2)
 
-    gauss = offset + amplitude * np.exp(-(a * ((x - xo)**2) + 2 * b * (x - xo) * (y - yo) + c * ((y - yo)**2)))
+    gauss = amplitude * np.exp(-(a * ((x - xo)**2) + 2 * b * (x - xo) * (y - yo) + c * ((y - yo)**2)))
 
-    # x = cs * (yx[1] - xo) - sn * (yx[0] - yo)
-    # y = sn * (yx[1] - xo) + cs * (yx[0] - yo)
-    #
-    # gauss = offset + amplitude * np.exp(-0.5 * ((x * x) / (2 * sigma_x * sigma_x) + (y * y) / (2 * sigma_y * sigma_y)))
-    if do_ravel:
-        return gauss.ravel()
-    else:
-        return gauss
+    gauss += offset
+
+    return gauss
 
 
 ########################################################################################################################
@@ -59,7 +77,7 @@ def gaussian_2d(yx, yo, xo, amplitude, sigma_x, sigma_y, theta=0.0, offset=0.0, 
 ########################################################################################################################
 # https://stackoverflow.com/questions/21566379/fitting-a-2d-gaussian-function-using-scipy-optimize-curve-fit-valueerror-and-m
 ########################################################################################################################
-def lorentz_2d(yx, yo, xo, amplitude, gamma_x, gamma_y, theta=0.0, offset=0.0, do_ravel=True):
+def lorentz_2d(yx, yo, xo, amplitude, gamma_x, gamma_y, theta=0.0, offset=0.0, do_ravel=True, use_background=True):
     cs = np.cos(theta)
     sn = np.sin(theta)
 
@@ -69,12 +87,11 @@ def lorentz_2d(yx, yo, xo, amplitude, gamma_x, gamma_y, theta=0.0, offset=0.0, d
     ratio = gamma_x / gamma_y
     y = y * ratio
 
-    lorentz = offset + amplitude * (gamma_x * gamma_x / (x ** 2 + y ** 2 + gamma_x * gamma_x))
+    lorentz = amplitude * (gamma_x * gamma_x / (x ** 2 + y ** 2 + gamma_x * gamma_x))
 
-    if do_ravel:
-        return lorentz.ravel()
-    else:
-        return lorentz
+    lorentz += offset
+
+    return lorentz
 
 
 ########################################################################################################################
@@ -95,21 +112,36 @@ def lorentz_2d(yx, yo, xo, amplitude, gamma_x, gamma_y, theta=0.0, offset=0.0, d
 ########################################################################################################################
 # http://pd.chem.ucl.ac.uk/pdnn/peaks/pvii.htm
 ########################################################################################################################
-def pearson_vii_2d(yx, yo, xo, amplitude, m, w_x, w_y, theta=0.0, offset=0.0, do_ravel=True):
+def pearson_vii_2d(yx, yo, xo, amplitude, m, w_x, w_y, theta=0.0, offset=0.0):
     cs = np.cos(theta)
     sn = np.sin(theta)
 
     x = cs * (yx[1] - xo) - sn * (yx[0] - yo)
     y = sn * (yx[1] - xo) + cs * (yx[0] - yo)
 
-    ratio = w_x / w_y
+    if w_x == np.inf and w_y == np.inf:
+        ratio = 1
+    else:
+        ratio = w_x / w_y
     y = y * ratio
 
-    pearsons = offset + amplitude * (w_x ** (2 * m)) / (w_x ** 2 + (2 ** (1 / m) - 1) * (x ** 2 + y ** 2)) ** m
-    if do_ravel:
-        return pearsons.ravel()
-    else:
-        return pearsons
+    numer = (w_x ** (2 * m))
+    denom = (w_x ** 2 + (2 ** (1 / m) - 1) * (x ** 2 + y ** 2)) ** m
+
+    if numer == np.inf and np.any(denom == np.inf):
+        numer = 0.0
+        denom = np.ones_like(yx[1])
+
+    pearsons = amplitude * numer / denom
+
+    pearsons += offset
+
+    if np.any(np.isnan(pearsons)):
+        print('oops')
+
+
+
+    return pearsons
 
 
 ########################################################################################################################
@@ -133,22 +165,26 @@ def pearson_vii_2d(yx, yo, xo, amplitude, m, w_x, w_y, theta=0.0, offset=0.0, do
 # http://pd.chem.ucl.ac.uk/pdnn/peaks/others.htm
 ########################################################################################################################
 def pseudo_voigt_2d(yx, yo, xo, amplitude, frac, sigma_x, sigma_y, gamma_x, gamma_y,
-                    theta=0.0, offset=0.0, do_ravel=True):
+                    theta=0.0, offset=0.0):
     cs = np.cos(theta)
     sn = np.sin(theta)
 
     x = cs * (yx[1] - xo) - sn * (yx[0] - yo)
     y = sn * (yx[1] - xo) + cs * (yx[0] - yo)
 
-    gauss = offset + amplitude * np.exp(-((x * x) / (2 * sigma_x * sigma_x) + (y * y) / (2 * sigma_y * sigma_y)))
+    gauss = np.exp(-((x * x) / (2 * sigma_x * sigma_x) + (y * y) / (2 * sigma_y * sigma_y)))
 
-    ratio = gamma_x / gamma_y
-    y = y * ratio
+    if np.abs(gamma_x) == np.inf or np.abs(gamma_y) == np.inf:
+        lorentz = 1.0
 
-    lorentz = (gamma_x * gamma_x / (x ** 2 + y ** 2 + gamma_x * gamma_x))
-
-    voigt = offset + amplitude * (frac * lorentz + (1-frac) * gauss)
-    if do_ravel:
-        return voigt.ravel()
     else:
-        return voigt
+        ratio = gamma_x / gamma_y
+        y = y * ratio
+
+        lorentz = (gamma_x * gamma_x / (x ** 2 + y ** 2 + gamma_x * gamma_x))
+
+    voigt = offset + amplitude * (frac * lorentz + (1 - frac) * gauss)
+
+    voigt += offset
+
+    return voigt

@@ -57,3 +57,26 @@ def smooth_circle_like(in_image, centre_x, centre_y, radius_in, radius_out):
     xx, yy = np.meshgrid(x, y)
     r = np.sqrt(xx**2 + yy**2)
     return (-1 * smooth_step(r, radius_in, radius_out)) + 1
+
+
+def point_is_on_edge_of_image(data, point, r):
+    p_int = np.round(point).astype(np.int)
+
+    im_dim = data.shape
+
+    # check points are not outside image (or within 'r' of the edge)
+    if (im_dim[1] - r) <= p_int[1] or p_int[1] < r or (im_dim[0] - r) <= p_int[0] or p_int[0] < r:
+        return True
+    return False
+
+
+def get_image_region(full_image, point, r):
+    p_int = np.round(point).astype(np.int)
+
+    _y_lo = p_int[0] - r
+    _y_hi = p_int[0] + r + 1
+
+    _x_lo = p_int[1] - r
+    _x_hi = p_int[1] + r + 1
+
+    return full_image[_y_lo:_y_hi, _x_lo:_x_hi]
