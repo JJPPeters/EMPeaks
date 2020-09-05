@@ -196,6 +196,9 @@ def overdetermined_rigid_align(image, crop_stack=True, align_stack=True, average
     return return_dict
 
 
+#
+# Li, X., Mooney, P., Zheng, S. et al. Electron counting and beam-induced motion correction enable near-atomic-resolution single-particle cryo-EM. Nat Methods 10, 584–590 (2013). https://doi.org/10.1038/nmeth.2472
+#
 def register_rigid_translate_overdetermined(stack, align_stack=True):
     # number of frames
     n = stack.shape[2]
@@ -223,7 +226,13 @@ def register_rigid_translate_overdetermined(stack, align_stack=True):
 
             count += 1
 
-    r_s = np.dot(np.dot(np.linalg.inv(np.dot(A.T, A)), A.T), b)
+    t1 = np.dot(A.T, A)
+    t2 = np.linalg.inv(t1)
+    t3 = np.dot(t2, A.T)
+    r_s = np.dot(t3, b)
+
+    for i in range(1, r_s.shape[0]):
+        r_s[i] += r_s[i-1]
 
     aligned = np.zeros_like(stack)
     aligned[:, :, 0] = stack[:, :, 0]
@@ -237,6 +246,7 @@ def register_rigid_translate_overdetermined(stack, align_stack=True):
         outputs['aligned_stack'] = aligned
 
     return outputs
+
 
 def pyramid_rigid_align(image, pyramid_size=3, crop_stack=True, align_stack=True, average_stack=True):
     # measure the shifts
