@@ -54,7 +54,7 @@ class IterativeRefineGaussian(MenuEntryModule):
                                       frac_change=v[4] / 100,
                                       do_init_fit=v[6],
                                       fit_method=v[5],
-                                      use_rot=v['θ symmetric'])
+                                      use_rot=not v['θ symmetric'])
 
         self.create_or_update_scatter(tag, fit_out[0])
 
@@ -107,7 +107,7 @@ class IterativeRefineLorentzian(MenuEntryModule):
                                         frac_change=v[4] / 100,
                                         do_init_fit=v[6],
                                         fit_method=v[5],
-                                        use_rot=v['θ symmetric'])
+                                        use_rot=not v['θ symmetric'])
 
         self.create_or_update_scatter(tag, fit_out[0])
 
@@ -160,7 +160,7 @@ class IterativeRefinePearson(MenuEntryModule):
                                         frac_change=v[4] / 100,
                                         do_init_fit=v[6],
                                         fit_method=v[5],
-                                        use_rot=v['θ symmetric'])
+                                        use_rot=not v['θ symmetric'])
 
         self.create_or_update_scatter(tag, fit_out[0])
 
@@ -213,7 +213,7 @@ class IterativeRefineVoigt(MenuEntryModule):
                                       frac_change=v[4] / 100,
                                       do_init_fit=v[6],
                                       fit_method=v[5],
-                                      use_rot=v['θ symmetric'])
+                                      use_rot=not v['θ symmetric'])
 
         self.create_or_update_scatter(tag, fit_out[0])
 
