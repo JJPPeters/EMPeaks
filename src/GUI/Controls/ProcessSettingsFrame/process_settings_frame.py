@@ -70,7 +70,6 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
 
         if self.function is not None:
             self.sigApplyFilter.connect(self.function)
-            self.signal_result.connect(self.function)
 
         if self.undo_function is not None:
             self.signal_undo.connect(self.undo_function)
@@ -97,7 +96,7 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
 
         return control_values
 
-    def apply_action(self, do_emit=True):
+    def apply_action(self):
         control_values = self.get_control_values()
         self.sigApplyFilter.emit(control_values)
 
@@ -132,7 +131,7 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
     # Slot
     def on_ok_clicked(self):
         self.undo_action()
-        self.apply_action(do_emit=False)
+        self.apply_action()
         self.signal_result.emit(self, True)
         # self.close()
 
