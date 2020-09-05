@@ -31,13 +31,14 @@ class IterativeRefineGaussian(MenuEntryModule):
         frac_change = ["SpinInt", 4, "Parameter change percent", (0, max_int, 5, 0)]
         fit_method = ["Combo", 5, "Fit method", fit_methods, 0]
         init_fit = ["Check", 6, "Fit initial", False]
+        use_rot = ["Check", 7, "θ symmetric", True]
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
             master=self.active_image_window,
             name="Gaussian",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
-            inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit],
+            inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit, use_rot],
             show_preview=False, show_apply=False, preserve_peaks=True)
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
@@ -52,7 +53,8 @@ class IterativeRefineGaussian(MenuEntryModule):
                                       lim=v[3],
                                       frac_change=v[4] / 100,
                                       do_init_fit=v[6],
-                                      fit_method=v[5])
+                                      fit_method=v[5],
+                                      use_rot=v['θ symmetric'])
 
         self.create_or_update_scatter(tag, fit_out[0])
 
@@ -82,13 +84,14 @@ class IterativeRefineLorentzian(MenuEntryModule):
         frac_change = ["SpinInt", 4, "Parameter change percent", (0, max_int, 5, 0)]
         fit_method = ["Combo", 5, "Fit method", fit_methods, 0]
         init_fit = ["Check", 6, "Fit initial", False]
+        use_rot = ["Check", 7, "θ symmetric", True]
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
             master=self.active_image_window,
             name="Lorentzian",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
-            inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit],
+            inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit, use_rot],
             show_preview=False, show_apply=False, preserve_peaks=True)
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
@@ -103,7 +106,8 @@ class IterativeRefineLorentzian(MenuEntryModule):
                                         lim=v[3],
                                         frac_change=v[4] / 100,
                                         do_init_fit=v[6],
-                                        fit_method=v[5])
+                                        fit_method=v[5],
+                                        use_rot=v['θ symmetric'])
 
         self.create_or_update_scatter(tag, fit_out[0])
 
@@ -133,13 +137,14 @@ class IterativeRefinePearson(MenuEntryModule):
         frac_change = ["SpinInt", 4, "Parameter change percent", (0, max_int, 5, 0)]
         fit_method = ["Combo", 5, "Fit method", fit_methods, 0]
         init_fit = ["Check", 6, "Fit initial", False]
+        use_rot = ["Check", 7, "θ symmetric", True]
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
             master=self.active_image_window,
             name="Pearson VII",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
-            inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit],
+            inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit, use_rot],
             show_preview=False, show_apply=False, preserve_peaks=True)
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
@@ -154,7 +159,8 @@ class IterativeRefinePearson(MenuEntryModule):
                                         lim=v[3],
                                         frac_change=v[4] / 100,
                                         do_init_fit=v[6],
-                                        fit_method=v[5])
+                                        fit_method=v[5],
+                                        use_rot=v['θ symmetric'])
 
         self.create_or_update_scatter(tag, fit_out[0])
 
@@ -184,13 +190,14 @@ class IterativeRefineVoigt(MenuEntryModule):
         frac_change = ["SpinInt", 4, "Parameter change percent", (0, max_int, 5, 0)]
         fit_method = ["Combo", 5, "Fit method", fit_methods, 0]
         init_fit = ["Check", 6, "Fit initial", False]
+        use_rot = ["Check", 7, "θ symmetric", True]
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
             master=self.active_image_window,
             name="Pseudo Voigt",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
-            inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit],
+            inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit, use_rot],
             show_preview=False, show_apply=False, preserve_peaks=True)
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
@@ -199,13 +206,14 @@ class IterativeRefineVoigt(MenuEntryModule):
         v = params
 
         fit_out = do_fitting_it_voigt(image, self.active_image_window.plottables[tag].points,
-                                        fit_r=v[0],
-                                        contribute_r=v[1],
-                                        iterations=v[2],
-                                        lim=v[3],
-                                        frac_change=v[4] / 100,
-                                        do_init_fit=v[6],
-                                        fit_method=v[5])
+                                      fit_r=v[0],
+                                      contribute_r=v[1],
+                                      iterations=v[2],
+                                      lim=v[3],
+                                      frac_change=v[4] / 100,
+                                      do_init_fit=v[6],
+                                      fit_method=v[5],
+                                      use_rot=v['θ symmetric'])
 
         self.create_or_update_scatter(tag, fit_out[0])
 

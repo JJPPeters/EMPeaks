@@ -4,8 +4,8 @@ from .direction_control_widget import DirectionControlWidget
 from .item_list_widget import ItemListWidget
 import numpy as np
 
-from GUI.Utilities.enums import ImageType, WindowType, AnnotationType
-from Processing.Utilities.peak_functions import gaussian_2d
+from GUI.Utilities.enums import WindowType, AnnotationType
+from Processing.Utilities.PeakFunctions.peak_functions import gaussian_2d
 from GUI.Utilities import save_peaks, save_quiver
 
 from GUI.Controls.Plot.Plottables import ImagePlot, PolarImagePlot

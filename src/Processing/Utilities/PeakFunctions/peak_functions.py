@@ -1,27 +1,56 @@
 import numpy as np
+from scipy.special import erf
 
 #
 # These functions just call the functions below, but are set up to work for least squares fitting
 #
 
-def gaussian_2d_fitting(yx, yo, xo, amplitude, sigma_x, sigma_y, theta, offset):
-    gauss = gaussian_2d(yx, yo, xo, amplitude, sigma_x, sigma_y, theta, offset)
+
+def gaussian_2d_fitting(yx, yo, xo, amplitude, sigma, offset, sigma_y=None, theta=0):
+    if sigma_y is None:
+        sigma_y = sigma
+
+    gauss = gaussian_2d(yx, yo, xo, amplitude, sigma, sigma_y, theta, offset)
+
     return gauss.ravel()
 
 
-def lorentz_2d_fitting(yx, yo, xo, amplitude, gamma_x, gamma_y, theta, offset):
-    lorentz = lorentz_2d(yx, yo, xo, amplitude, gamma_x, gamma_y, theta, offset)
+def skewed_gaussian_2d_fitting(yx, yo, xo, amplitude, sigma_x, sigma_y, skew_x, skew_y, theta, offset):
+
+    gauss = skewed_gaussian_2d(yx, yo, xo, amplitude, sigma_x, sigma_y, skew_x, skew_y, theta, offset)
+
+    return gauss.ravel()
+
+
+def lorentz_2d_fitting(yx, yo, xo, amplitude, gamma, offset, gamma_y=None, theta=0):
+    if gamma_y is None:
+        gamma_y = gamma
+
+    lorentz = lorentz_2d(yx, yo, xo, amplitude, gamma, gamma_y, theta, offset)
+
     return lorentz.ravel()
 
 
-def pearson_vii_2d_fitting(yx, yo, xo, amplitude, m, w_x, w_y, theta, offset):
-    pearson = pearson_vii_2d(yx, yo, xo, amplitude, m, w_x, w_y, theta, offset)
+def pearson_vii_2d_fitting(yx, yo, xo, amplitude, m, w, offset, w_y=None, theta=0):
+    if w_y is None:
+        w_y = w
+
+    pearson = pearson_vii_2d(yx, yo, xo, amplitude, m, w, w_y, theta, offset)
+
     return pearson.ravel()
 
 
-def pseudo_voigt_2d_fitting(yx, yo, xo, amplitude, frac, sigma_x, sigma_y, gamma_x, gamma_y, theta, offset):
-    voigt = pseudo_voigt_2d(yx, yo, xo, amplitude, frac, sigma_x, sigma_y, gamma_x, gamma_y, theta, offset)
+def pseudo_voigt_2d_fitting(yx, yo, xo, amplitude, frac, sigma, gamma, offset, sigma_y=None, gamma_y=None, theta=0):
+    if sigma_y is None:
+        sigma_y = sigma
+
+    if gamma_y is None:
+        gamma_y = gamma
+
+    voigt = pseudo_voigt_2d(yx, yo, xo, amplitude, frac, sigma, sigma_y, gamma, gamma_y, theta, offset)
+
     return voigt.ravel()
+
 
 ########################################################################################################################
 # gaussian_2d
@@ -39,21 +68,43 @@ def pseudo_voigt_2d_fitting(yx, yo, xo, amplitude, frac, sigma_x, sigma_y, gamma
 # do_ravel - return output as list like (for curve_fit)
 # use_background - toggles using offset (only used for keeping background from generic fitting functions)
 ########################################################################################################################
-# https://stackoverflow.com/questions/21566379/fitting-a-2d-gaussian-function-using-scipy-optimize-curve-fit-valueerror-and-m
+# https://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function
 ########################################################################################################################
 def gaussian_2d(yx, yo, xo, amplitude, sigma_x, sigma_y, theta=0.0, offset=0.0):
-    x = yx[1]
-    y = yx[0]
-
     cs = np.cos(theta)
     sn = np.sin(theta)
-    sn2 = np.sin(2*theta)
 
-    a = cs**2 / (2 * sigma_x**2) + sn**2 / (2 * sigma_y**2)
-    b = -sn2 / (4 * sigma_x**2) + sn2 / (4 * sigma_y**2)
-    c = sn**2 / (2 * sigma_x**2) + cs**2 / (2 * sigma_y**2)
+    x = cs * (yx[1] - xo) - sn * (yx[0] - yo)
+    y = sn * (yx[1] - xo) + cs * (yx[0] - yo)
 
-    gauss = amplitude * np.exp(-(a * ((x - xo)**2) + 2 * b * (x - xo) * (y - yo) + c * ((y - yo)**2)))
+    term_x = x**2 / (2 * sigma_x**2)
+    term_y = y** 2 / (2 * sigma_y ** 2)
+
+    gauss = amplitude * np.exp(-(term_x + term_y))
+
+    gauss += offset
+
+    return gauss
+
+
+########################################################################################################################
+# https://en.wikipedia.org/wiki/Skew_normal_distribution
+# https://lmfit.github.io/lmfit-py/builtin_models.html#lmfit.models.SkewedGaussianModel
+########################################################################################################################
+def skewed_gaussian_2d(yx, yo, xo, amplitude, sigma_x, sigma_y, skew_x, skew_y, theta=0.0, offset=0.0):
+    cs = np.cos(theta)
+    sn = np.sin(theta)
+
+    x = cs * (yx[1] - xo) - sn * (yx[0] - yo)
+    y = sn * (yx[1] - xo) + cs * (yx[0] - yo)
+
+    term_x = x ** 2 / (2 * sigma_x ** 2)
+    term_y = y ** 2 / (2 * sigma_y ** 2)
+
+    erf_x = erf(skew_x * x / (sigma_x * np.sqrt(2)))
+    erf_y = erf(skew_y * y / (sigma_y * np.sqrt(2)))
+
+    gauss = amplitude * np.exp(-(term_x + term_y)) * (1 + erf_x) * (1 + erf_y)
 
     gauss += offset
 

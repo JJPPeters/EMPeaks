@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.special import comb
-from .peak_functions import gaussian_2d
+from Processing.Utilities.PeakFunctions.peak_functions import gaussian_2d
 
 
 # this is sort of supposed to be used like the gaussian option of fspecial in matlab

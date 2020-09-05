@@ -1,8 +1,5 @@
 import numpy as np
 from scipy import ndimage
-from scipy.optimize import curve_fit
-
-from Processing.Utilities import fit_3_point_parabola, gaussian_2d, pearson_vii_2d, pseudo_voigt_2d
 from Processing.Utilities import normalise_copy
 
 
