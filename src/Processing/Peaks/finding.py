@@ -26,43 +26,39 @@ def detect_local_maxima(img, min_dist=0, thresh=0.0):
     return peaks
 
 
-# def detect_local_maxima(arr):
-#     neighborhood = ndimage.generate_binary_structure(len(arr.shape), 2)
-#     local_max = (ndimage.maximum_filter(arr, footprint=neighborhood) == arr)
-#     background = (arr == 0)
-#     eroded_background = ndimage.morphology.binary_erosion(
-#         background, structure=neighborhood, border_value=1)
-#     detected_maxima = local_max - eroded_background
-#     tup = np.where(detected_maxima)
-#     tup[0].shape = (tup[0].size, 1)
-#     tup[1].shape = (tup[1].size, 1)
-#     return np.column_stack(tup)
-
-
-def average_nearby_peaks(data, ps, r=5):
+def average_nearby_peaks(data, ps, r=5, use_average=False):
+    new_points = ps.copy()
     # make these now, they won't be all used, but they will be bigger than the output so can just crop
-    points = ps.astype('float64')
-    new_points = np.empty_like(points, dtype='float64')
+    psi = new_points.astype(np.int)
+    vals = data[psi[:,0], psi[:,1]]
+    good = np.ones_like(vals, dtype=np.bool)
 
-    dists = cdist(points, points, 'Euclidean')
+    sorted_inds = np.argsort(vals)[::-1]
 
-    new_cnt = 0
-    for i, ds in enumerate(dists):
-        close_inds = np.where(ds < r)[0]
-        close_points = points[close_inds, :]
+    dists = cdist(ps, ps, 'Euclidean')
+
+    for i in sorted_inds:
+        if not good[i]:
+            continue
+
+        close_inds = np.where((r > dists[i, :]) & good)[0]
+        close_points = ps[close_inds, :]
 
         if close_points.shape[0] > 1:
+            if use_average:
+                mass = data[close_points[:, 0].astype(np.int), close_points[:, 1].astype(np.int)]
 
-            mass = data[close_points[:, 0].astype(np.int32), close_points[:, 1].astype(np.int32)]
+                cent_x = np.sum(close_points[:, 1] * mass, axis=0) / np.sum(mass)
+                cent_y = np.sum(close_points[:, 0] * mass, axis=0) / np.sum(mass)
 
-            cent = np.mean(close_points * mass, axis=0) / np.sum(mass)
+                new_points[i, 0] = cent_y
+                new_points[i, 1] = cent_x
 
-            new_points[new_cnt, :] = cent[:]
-        else:
-            new_points[new_cnt] = points[i, :]
-        new_cnt += 1
+            good[close_inds] = False
+            good[i] = True
 
-    return remove_duplicates(new_points[:new_cnt])
+    return new_points[good, :]
+
 
 def estimate_lattice_vectors(image):
     # 1. FFT (power spectrum) with hann window

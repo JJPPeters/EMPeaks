@@ -93,13 +93,15 @@ class ImageWindow(QtWidgets.QMainWindow):
 
     def keyPressEvent(self, evt):
 
+        c_slice = self.image_plot.current_slice
+
         # want to delete a peak
         if evt.key() == QtCore.Qt.Key_Delete or evt.key() == QtCore.Qt.Key_Backspace:
             self.delete_selected()
         elif evt.key() == QtCore.Qt.Key_Left:
-            self.ui.zScroll.setSliderPosition(self.current_slice)
+            self.ui.zScroll.setSliderPosition(c_slice - 1)
         elif evt.key() == QtCore.Qt.Key_Right:
-            self.ui.zScroll.setSliderPosition(self.current_slice + 2)  # index is not from 0, hence the funny business
+            self.ui.zScroll.setSliderPosition(c_slice + 1)  # index is not from 0, hence the funny business
 
     @property
     def image_plot(self) -> Union[ImagePlot, None]:
