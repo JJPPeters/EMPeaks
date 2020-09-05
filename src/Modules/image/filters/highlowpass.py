@@ -56,13 +56,13 @@ class HighLowPass(MenuEntryModule):
         # Sort out the fft display stuff
         #
 
-        self.new_image_widget = PlotWidget()
+        self.new_image_widget = PlotWidget(show_axes=False)
 
         # # show it next to the current image
         self.active_image_window.ui.gridLayout.addWidget(self.new_image_widget, 0, 2)
 
         self.fft_plot = ImagePlot(self.fft_im)
-        self.new_image_widget.add_item(self.fft_plot, fit=True)
+        self.new_image_widget.plot_view.add_widget(self.fft_plot, fit=True)
         self.new_image_widget.update()
 
         # get the centre of the FFT (and a arbitrary radius that is within the image
@@ -74,7 +74,7 @@ class HighLowPass(MenuEntryModule):
                                      border_width=2, z_value=999)
         self.circ.make_buffers(c[1], c[0], r[1], r[0])
 
-        self.new_image_widget.add_item(self.circ)
+        self.new_image_widget.plot_view.add_widget(self.circ)
         self.new_image_widget.update()
 
         # now we need to connect our filter settings widget to the circle annotation
@@ -84,14 +84,14 @@ class HighLowPass(MenuEntryModule):
         self.filtersettings.signal_result.connect(self.got_result)
 
     def got_result(self, widget, state):
-        self.new_image_widget.remove_item(self.circ)
+        self.new_image_widget.plot_view.remove_widget(self.circ)
         self.circ = None
 
-        self.new_image_widget.remove_item(self.fft_plot)
+        self.new_image_widget.plot_view.remove_widget(self.fft_plot)
         self.fft_plot.image_data = None
         self.fft_plot = None
 
-        print('getting rid of')
+        # print('getting rid of')
         self.active_image_window.ui.gridLayout.removeWidget(self.new_image_widget)
         # todo: does this do what I want?? does it ever actually get deleted?
         self.new_image_widget.close()
@@ -121,7 +121,7 @@ class HighLowPass(MenuEntryModule):
         mask = smooth_circle_like(self.fft_im, c[1], c[0], r - smth, r + smth)
 
         # if low pass
-        if vals['Type'] == 'Low pass':
+        if vals['Type'] == 'High pass':
             mask = -1 * (mask - 1)
 
         masked_fft = self.fft_im * mask

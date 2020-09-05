@@ -62,7 +62,7 @@ class BandPass(MenuEntryModule):
         self.active_image_window.ui.gridLayout.addWidget(self.new_image_widget, 0, 2)
 
         self.fft_plot = ImagePlot(self.fft_im)
-        self.new_image_widget.add_item(self.fft_plot, fit=True)
+        self.new_image_widget.plot_view.add_widget(self.fft_plot, fit=True)
         self.new_image_widget.update()
 
         # get the centre of the FFT (and a arbitrary radius that is within the image
@@ -74,7 +74,7 @@ class BandPass(MenuEntryModule):
                                    border_width=2, z_value=999)
         self.ring.make_buffers(c[1], c[0], r[1], r[0], 0.5)
 
-        self.new_image_widget.add_item(self.ring)
+        self.new_image_widget.plot_view.add_widget(self.ring)
         self.new_image_widget.update()
 
         # now we need to connect our filter settings widget to the circle annotation
@@ -85,14 +85,14 @@ class BandPass(MenuEntryModule):
         self.filtersettings.signal_result.connect(self.got_result)
 
     def got_result(self, widget, state):
-        self.new_image_widget.remove_item(self.ring)
+        self.new_image_widget.plot_view.remove_widget(self.ring)
         self.ring = None
 
-        self.new_image_widget.remove_item(self.fft_plot)
+        self.new_image_widget.plot_view.remove_widget(self.fft_plot)
         self.fft_plot.image_data = None
         self.fft_plot = None
 
-        print('getting rid of')
+        # print('getting rid of')
         self.active_image_window.ui.gridLayout.removeWidget(self.new_image_widget)
         # todo: does this do what I want?? does it ever actually get deleted?
         self.new_image_widget.close()
@@ -141,7 +141,7 @@ class BandPass(MenuEntryModule):
         mask_outer = smooth_circle_like(self.fft_im, c[1], c[0], r_out - smth, r_out + smth)
         mask_inner = smooth_circle_like(self.fft_im, c[1], c[0], r_in - smth, r_in + smth)
 
-        mask = mask_inner - mask_outer
+        mask = mask_outer - mask_inner
 
         masked_fft = self.fft_im * mask
         new_im = np.abs(np.fft.ifft2(np.fft.fftshift(masked_fft)))

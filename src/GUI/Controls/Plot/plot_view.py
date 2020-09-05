@@ -198,11 +198,12 @@ class PlotView(QtCore.QObject):
         self.mouse_is_dragging = False
         self.mouse_drag_modifiers = modifiers
 
-        # self.clicked_object = None
+        self.clicked_object = None
 
         for widge in self.widgets:
             if self.clicked_object is None:
-                grabber = widge.on_click(pos_x, pos_y, 1.0) # TODO: use this coord system???
+                p_x, p_y = self.parent_coords_to_view_position(pos_x, pos_y)
+                grabber = widge.on_click(p_x, p_y, (1.0, 1.0))  # TODO: use this coord system???
 
                 if grabber is not None:
                     self.clicked_object = grabber

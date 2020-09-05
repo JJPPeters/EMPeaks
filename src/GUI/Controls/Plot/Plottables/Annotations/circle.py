@@ -15,6 +15,8 @@ class CircleAnnotation(QtCore.QObject):
                  selectable=True, movable=True, resizable=True, maintain_aspect=False, resize_symmetric=False):
         super(CircleAnnotation, self).__init__()
 
+        self._parent = None
+
         self.selected = False
 
         # these parameters are used for resizing symmetrically or keeping the same aspect ratio
@@ -37,8 +39,6 @@ class CircleAnnotation(QtCore.QObject):
                                          border_width=border_width,
                                          z_value=z_value, visible=visible)
 
-        self.circle.initialise()
-
         self.handle_size = 10
         self.handles = {}
         ids = ['tl', 'tr', 'br', 'bl']
@@ -55,8 +55,24 @@ class CircleAnnotation(QtCore.QObject):
     def z_value(self):
         return self.circle.z_value
 
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+
+        self.circle.parent = value
+
+        for h in self.handles.values():
+            h.parent = value
+
     def initialise(self):
-        return
+        self.circle.initialise()
+
+        for h in self.handles.values():
+            h.initialise()
 
     def get_centre(self) -> tuple:
         lims = self.limits

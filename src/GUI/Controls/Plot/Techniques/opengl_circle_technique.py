@@ -45,6 +45,8 @@ class OglCircleTechnique(OglTechnique):
         self.radii = np.array([10, 10], dtype=np.float32)
         self.ring_frac = ring_frac
 
+        self.deferred_make_buffer = False
+
     @property
     def limits(self):
         t = self.centre[1] + self.radii[1]
@@ -55,6 +57,10 @@ class OglCircleTechnique(OglTechnique):
         return np.array([t, l, b, r], dtype=np.float32)
 
     def initialise(self):
+        # check if this has been initialised
+        if self.centre_location is not None:
+            return
+
         super(OglCircleTechnique, self).initialise()
 
         vertex_shader_string = shaders.vertex_shader
@@ -82,12 +88,30 @@ class OglCircleTechnique(OglTechnique):
         self.border_width_y_location = self.get_uniform_location("border_width_y")
         self.ring_frac_location = self.get_uniform_location("ring_frac")
 
+        if self.deferred_make_buffer:
+            self._make_buffers()
+            self.deferred_make_buffer = False
+
     def make_buffers(self, c_x, c_y, r_x, r_y):
         # doesnt actually set buffers!
         self.centre = np.array([c_x, c_y], dtype=np.float32)
         self.radii = np.array([r_x, r_y], dtype=np.float32)
 
-        self.centre_buffer = OglAttributeBuffer(self.centre.reshape((1, 2)), self.centre_location)
+        try:
+            self._make_buffers()
+        except Exception as e:
+            self.deferred_make_buffer = True
+
+    def _make_buffers(self):
+        if self.centre_location is None:
+            raise Exception("Buffer positions are invalid")
+
+        if self.centre_buffer is not None and self.centre.size == 2:
+            self.centre_buffer.update_all(self.centre.reshape((1, 2)))
+        else:
+            self.centre_buffer = OglAttributeBuffer(self.centre.reshape((1, 2)), self.centre_location)
+
+        self.deferred_make_buffer = False
 
     def render(self, projection, width, height, ratio):
         if not self.visible:

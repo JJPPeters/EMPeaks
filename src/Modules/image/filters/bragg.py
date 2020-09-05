@@ -97,7 +97,7 @@ class BraggFilterModule(MenuEntryModule):
         self.active_image_window.ui.gridLayout.addWidget(self.new_image_widget, 0, 2)
 
         self.fft_plot = ImagePlot(self.fft_im)
-        self.new_image_widget.add_item(self.fft_plot, fit=True)
+        self.new_image_widget.plot_view.add_widget(self.fft_plot, fit=True)
         self.new_image_widget.update()
 
         #
@@ -135,11 +135,11 @@ class BraggFilterModule(MenuEntryModule):
                                          border_colour=np.array([255, 255, 255, 255]) / 255,
                                          visible=False, use_screen_space=False, z_value=998)
 
-        self.new_image_widget.add_item(self.circ_2)
-        self.new_image_widget.add_item(self.circ_1)
-        self.new_image_widget.add_item(self.mirror_circ_1)
-        self.new_image_widget.add_item(self.circ_middle)
-        self.new_image_widget.add_item(self.array_scatter)
+        self.new_image_widget.plot_view.add_widget(self.circ_2)
+        self.new_image_widget.plot_view.add_widget(self.circ_1)
+        self.new_image_widget.plot_view.add_widget(self.mirror_circ_1)
+        self.new_image_widget.plot_view.add_widget(self.circ_middle)
+        self.new_image_widget.plot_view.add_widget(self.array_scatter)
 
         self.update_array_circs()
 
@@ -170,11 +170,11 @@ class BraggFilterModule(MenuEntryModule):
         # self.new_image_widget.remove_item(self.circ)
         # self.circ = None
 
-        self.new_image_widget.remove_item(self.fft_plot)
+        self.new_image_widget.plot_view.remove_widget(self.fft_plot)
         self.fft_plot.image_data = None
         self.fft_plot = None
 
-        print('getting rid of')
+        # print('getting rid of')
         self.active_image_window.ui.gridLayout.removeWidget(self.new_image_widget)
         # todo: does this do what I want?? does it ever actually get deleted?
         self.new_image_widget.close()
@@ -322,12 +322,54 @@ class BraggFilterModule(MenuEntryModule):
         # get the radius we have set currently
         r = vals['Radius']
         smth = vals['Smooth'] / 2
-        c = np.ceil(np.array(self.fft_im.shape) / 2)
-        mask = smooth_circle_like(self.fft_im, c[1], c[0], r - smth, r + smth)
 
-        # if low pass
-        if vals['Type'] == 'Low pass':
-            mask = -1 * (mask - 1)
+        im_shp = np.array(self.fft_im.shape)
+        c = np.ceil(im_shp / 2)
+
+        v1 = np.array([vals['g1 y'], vals['g1 x']])
+
+        v2 = np.array([vals['g2 y'], vals['g2 x']])
+
+        do_array = vals['Array']
+        do_mirror = vals['Mirror']
+
+        mask = np.zeros_like(self.fft_im, dtype=np.float64)
+
+        #
+        # Need to work out our mask array
+        #
+        if do_array:
+            n1_a = np.abs(im_shp[0] / (v1[0] + v2[0]))
+            n1_b = np.abs(im_shp[0] / (v1[0] - v2[0]))
+            n1_c = np.abs(im_shp[0] / (-v1[0] + v2[0]))
+
+            n2_a = np.abs(im_shp[1] / (v1[1] + v2[1]))
+            n2_b = np.abs(im_shp[1] / (v1[1] - v2[1]))
+            n2_c = np.abs(im_shp[1] / (-v1[1] + v2[1]))
+
+            n = np.max([n1_a, n1_b, n1_c, n2_a, n2_b, n2_c])
+            n = int(np.ceil(n / 2))
+
+            for j in range(-n, n+1):
+                for i in range(-n, n + 1):
+                    v = j * v1 + i * v2 + c
+
+                    r_eff = r + smth
+
+                    if im_shp[0] + r_eff > v[0] > -r_eff and im_shp[1] + r_eff > v[1] > -r_eff:
+                        new_mask = smooth_circle_like(self.fft_im, v[1], v[0], r - smth, r + smth)
+
+                        larger = new_mask > mask
+                        mask[larger] = new_mask[larger]
+        else:
+            new_mask = smooth_circle_like(self.fft_im, c[1] + v1[1], c[0] + v1[0], r - smth, r + smth)
+            larger = new_mask > mask
+            mask[larger] = new_mask[larger]
+
+        if do_mirror:
+            new_mask = smooth_circle_like(self.fft_im, c[1] - v1[1], c[0] - v1[0], r - smth, r + smth)
+            larger = new_mask > mask
+            mask[larger] = new_mask[larger]
 
         masked_fft = self.fft_im * mask
 

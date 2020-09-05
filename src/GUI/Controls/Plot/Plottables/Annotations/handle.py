@@ -18,8 +18,6 @@ class Handle(OglScatterTechnique, QtCore.QObject):
         self.selected_peaks = None
         self.position = position
 
-        self.initialise()
-
     def on_drag(self, pos_x, pos_y, modifiers):
         self.signal_drag.emit(pos_x, pos_y, modifiers)
         return True
