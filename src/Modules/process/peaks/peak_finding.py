@@ -69,20 +69,20 @@ class PeaksAverageClusters(MenuEntryModule):
         if not self.main_window.image_requirements_met():
             return
 
-        min_rad = ["SpinInt", 0, "Min radius", (1, 100, 2, 1)]
+        min_rad = ["SpinInt", 0, "Min radius", (1, 100, 1, 2)]
         do_av = ["Check", 1, "Average", False]
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
             master=self.main_window.last_active,
             name="Average clusters",
-            function=self.do_find_pixel_maxima,
+            function=self.do_average_clusters,
             inputs=[min_rad, do_av],
             show_preview=True, show_apply=False, preserve_peaks=True)
 
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
-    def do_find_pixel_maxima(self, params):
+    def do_average_clusters(self, params):
         tag = 'Peaks'
         if not self.main_window.image_requirements_met():
             return

@@ -3,13 +3,16 @@ import numpy as np
 from GUI.Dialogs.process_settings_dialog import ProcessSettingsDialog
 from Processing.PeakPairs import SubPeakPair
 from GUI.Controls.Plot.Plottables import Basis
-from GUI.Controls.Plot.Plottables import ScatterPlot
+from GUI.Controls.ProcessSettingsFrame import ProcessSettingsFrame
+from Processing.Peaks import cluster_peaks_by_intensity
+
+base_path = ['Process', 'Peaks', 'Label']
 
 
 class PeakPair(MenuEntryModule):
     def __init__(self):
         super().__init__()
-        self.menu_structure = ['Process', 'Peaks']
+        self.menu_structure = base_path
         self.name = 'Peak pair'
         self.order_priority = 650
 
@@ -62,12 +65,62 @@ class PeakPair(MenuEntryModule):
         affine_basis = np.array([[0, 1], [1, 0]])
         pp = SubPeakPair(affine_peaks, basis.vector_coords, basis.lattice_coords, affine_basis=affine_basis, thr=thresh)
 
+        for i, sub_lattice in enumerate(pp.subIndices):
+            self.create_or_update_scatter('sub' + str(i), affine_peaks[sub_lattice])
+
+
+class PeaksIntensityCluster(MenuEntryModule):
+    def __init__(self):
+        super().__init__()
+        self.menu_structure = base_path
+        self.name = 'Intensity cluster'
+        self.order_priority = 502
+
+        self.my_clusters = []
+
+    def run(self):
+        tag = 'Peaks'
+        if not self.main_window.image_requirements_met():
+            return
+
+        min_rad = ["SpinInt", 0, "Min radius", (1, 100, 1, 2)]
+
+        # runs as modal dlg
+        filter_settings = ProcessSettingsFrame(
+            master=self.main_window.last_active,
+            name="Cluster intensity",
+            function=self.do_average_clusters,
+            undo_function=self.undo_peaks,
+            inputs=[min_rad],
+            show_preview=True, show_apply=False, preserve_peaks=True)
+
+        self.add_widget_to_image_window(filter_settings, 0, 2)
+
+    def undo_peaks(self):
+        for name in self.my_clusters:
+            self.create_or_update_scatter(name, None)
+
+    def do_average_clusters(self, params):
+        tag = 'Peaks'
+        if not self.main_window.image_requirements_met():
+            return
+
+        peaks = self.main_window.last_active.plottables[tag].points
+        image = self.main_window.last_active.image_plot.intensities
+
+        new_peaks = cluster_peaks_by_intensity(image, peaks, clusters=params[0])
+
         i = 0
-        for sub_lattice in pp.subIndices:
-            scatter = ScatterPlot(points=affine_peaks[sub_lattice],
-                                  size=10,
-                                  fill_colour=np.array(next(self.main_window.scatter_cols)) / 255)
-            scatter.basis = basis
-            self.main_window.last_active.add_plottable('sub' + str(i), scatter)
-            # self.main_window.last_active.add_scatter(affinePeaks[sub_lattice], 'sub' + str(i), basis=basis)
+        new_clusters = []
+        for p in new_peaks:
+            name = 'cluster' + str(i)
+            self.create_or_update_scatter(name, p)
+            self.my_clusters.append(name)
+            new_clusters.append(name)
             i += 1
+
+        for j in range(i, len(self.my_clusters)):
+            name = 'cluster' + str(i)
+            self.create_or_update_scatter(name, None)
+
+        self.my_clusters = new_clusters

@@ -97,12 +97,19 @@ class Module:
         self.active_image_window.ui.imageItem.update()
 
     def create_or_update_scatter(self, tag, points):
-        if tag not in self.active_image_window.plottables:
+        if points is None:
+            self.active_image_window.delete_plottable(tag)
+            return
+
+        if tag not in self.active_image_window.plottables and points.size > 2:
             scatter = ScatterPlot(points=points,
                                   size=10,
                                   fill_colour=np.array(next(self.main_window.scatter_cols)) / 255)
-            self.active_image_window.add_plottable('Peaks', scatter)
+            self.active_image_window.add_plottable(tag, scatter)
         else:
-            self.active_image_window.plottables[tag].set_points(points)
+            if points.size > 2:
+                self.active_image_window.plottables[tag].set_points(points)
+            else:
+                self.active_image_window.delete_plottable(tag)
 
         self.active_image_window.ui.imageItem.update()

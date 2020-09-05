@@ -1,1 +1,1 @@
-from .finding import detect_local_maxima, average_nearby_peaks, estimate_lattice_vectors
+from .finding import detect_local_maxima, average_nearby_peaks, estimate_lattice_vectors, cluster_peaks_by_intensity

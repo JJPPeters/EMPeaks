@@ -3,8 +3,8 @@ import itertools
 from Processing.Utilities import remove_duplicates, hann_window, normalise_copy
 
 from scipy.spatial.distance import cdist
-
 from skimage.feature import peak_local_max
+from sklearn.cluster import KMeans
 
 
 def detect_local_maxima(img, min_dist=0, thresh=0.0):
@@ -26,11 +26,30 @@ def detect_local_maxima(img, min_dist=0, thresh=0.0):
     return peaks
 
 
+def cluster_peaks_by_intensity(data, ps, clusters=5):
+    new_points = ps.copy()
+    psi = new_points.astype(np.int)
+    vals = data[psi[:, 0], psi[:, 1]]
+
+    kmeans = KMeans(n_clusters=clusters, random_state=0).fit(vals.reshape(-1, 1))
+
+    labels = kmeans.labels_
+    lmax = np.max(labels)
+
+    out = []
+
+    for i in range(lmax + 1):
+        p = new_points[labels == i, :]
+        out.append(p)
+
+    return out
+
+
 def average_nearby_peaks(data, ps, r=5, use_average=False):
     new_points = ps.copy()
     # make these now, they won't be all used, but they will be bigger than the output so can just crop
     psi = new_points.astype(np.int)
-    vals = data[psi[:,0], psi[:,1]]
+    vals = data[psi[:, 0], psi[:, 1]]
     good = np.ones_like(vals, dtype=np.bool)
 
     sorted_inds = np.argsort(vals)[::-1]

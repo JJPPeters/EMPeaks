@@ -9,9 +9,10 @@ from Processing.Utilities.arrays import IndexedDict
 class ProcessSettingsFrame(QtWidgets.QWidget):
     sigApplyFilter = QtCore.pyqtSignal(object)
     signal_result = QtCore.pyqtSignal(object, bool)
+    signal_undo = QtCore.pyqtSignal()
 
-    def __init__(self, master, name='Filter', inputs=None, function=None, show_preview=False, show_apply=False,
-                 preserve_image=False, preserve_peaks=False):
+    def __init__(self, master, name='Filter', inputs=None, function=None, undo_function=None, show_preview=False,
+                 show_apply=False, preserve_image=False, preserve_peaks=False):
         super(ProcessSettingsFrame, self).__init__(master)
         self.master = master
         self.numIn = len(inputs)
@@ -22,6 +23,7 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
         self.preserve_peaks = preserve_peaks
 
         self.function = function
+        self.undo_function = undo_function
 
         self.origData = None
         self.orig_peaks = None
@@ -68,6 +70,10 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
 
         if self.function is not None:
             self.sigApplyFilter.connect(self.function)
+            self.signal_result.connect(self.function)
+
+        if self.undo_function is not None:
+            self.signal_undo.connect(self.undo_function)
 
     def get_control_values(self):
         control_values = IndexedDict()
@@ -91,7 +97,7 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
 
         return control_values
 
-    def apply_action(self):
+    def apply_action(self, do_emit=True):
         control_values = self.get_control_values()
         self.sigApplyFilter.emit(control_values)
 
@@ -107,6 +113,8 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
             else:
                 self.master.delete_plottable(tag)
             self.master.ui.imageItem.update()
+
+        self.signal_undo.emit()
 
     # accept args nad kargs as different controls may have different signals, but we don't care
     def on_control_changed(self, *args, **kargs):
@@ -124,7 +132,7 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
     # Slot
     def on_ok_clicked(self):
         self.undo_action()
-        self.apply_action()
+        self.apply_action(do_emit=False)
         self.signal_result.emit(self, True)
         # self.close()
 
