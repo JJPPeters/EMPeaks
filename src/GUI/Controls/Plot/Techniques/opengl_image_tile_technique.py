@@ -25,6 +25,10 @@ class OglImageTileTechnique(OglTechnique):
         self.min_location = None
         self.max_location = None
 
+        self.b_location = None
+        self.c_location = None
+        self.g_location = None
+
         self.colourmap_location = None
         self.texture_unit_location = None
 
@@ -47,6 +51,8 @@ class OglImageTileTechnique(OglTechnique):
         self.colour_map[:, 1] = np.linspace(0, 1, 256)
         self.colour_map[:, 2] = np.linspace(0, 1, 256)
         self.colour_map[:, 3] = 1
+
+        self.bcg = np.array([0.5, 1.0, 1.0])
 
     def initialise(self):
         if self.texture_unit_location is not None:
@@ -71,6 +77,10 @@ class OglImageTileTechnique(OglTechnique):
 
         self.min_location = self.get_uniform_location("image_min")
         self.max_location = self.get_uniform_location("image_max")
+
+        self.b_location = self.get_uniform_location("brightness")
+        self.c_location = self.get_uniform_location("contrast")
+        self.g_location = self.get_uniform_location("gamma")
 
         self.colourmap_location = self.get_uniform_location("colour_map")
 
@@ -160,6 +170,15 @@ class OglImageTileTechnique(OglTechnique):
 
         gl.glUniform1f(self.min_location, self.min)
         gl.glUniform1f(self.max_location, self.max)
+
+        b = self.bcg[0]
+        c = self.bcg[1]
+        g = self.bcg[2]
+
+        gl.glUniform1f(self.b_location, b)
+        gl.glUniform1f(self.c_location, c)
+        gl.glUniform1f(self.g_location, g)
+
         gl.glUniform1i(self.texture_unit_location, 0)
 
         gl.glUniform4fv(self.colourmap_location, 256, self.colour_map)

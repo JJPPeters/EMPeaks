@@ -125,7 +125,7 @@ class ColMapHistogramItem(QtWidgets.QWidget):
     def updateBCG(self, B, C, G):
         self.vb.makeCurrent()
         if self.image is not None and self.image.image_plot is not None:
-            self.image.image_plot.BCG = [B, C, G]
+            self.image.image_plot.set_bcg(B, C, G)
 
         B = 1.5 - (B * 2)
         C = 5 ** (4 * (C - 0.5))
@@ -146,25 +146,30 @@ class ColMapHistogramItem(QtWidgets.QWidget):
         self.vb.update()
 
     def gradientChanged(self):
-        if self.image is not None and self.image.image_plot is not None:
+        # if self.image is not None and self.image.image_plot is not None:
             # send function pointer, not the result
-            self.image.image_plot.set_colour_map(self.getLookupTable())
+            # self.image.image_plot.set_colour_map(self.getLookupTable(original=True))
 
-        self.lut = None
-        # self.sigLookupTableChanged.emit(self)
+        # self.lut = None
+        # # self.sigLookupTableChanged.emit(self)
+        return
 
-    def getLookupTable(self, img=None, n=None, alpha=True):
+    def getLookupTable(self, img=None, n=None, alpha=True, original=False):
         if n is None:
             n = 256
 
         if self.lut is None:
-            self.lut = self.gradient.getLookupTable(n, alpha=alpha)
+            self.lut = self.gradient.getLookupTable(n, alpha=alpha, original=original)
         return self.lut
 
     def changeColmap(self, cmap):
         if self.image is not None and self.image.image_plot is not None:
             self.gradient.changeColmap(cmap)
             self.staticGradient.changeColmap(cmap)
+
+            self.image.image_plot.set_colour_map(self.getLookupTable(original=True))
+
+        self.lut = None
 
     def complexImageChanged(self, complex_type):
         if self.image is not None and self.image.image_plot is not None:

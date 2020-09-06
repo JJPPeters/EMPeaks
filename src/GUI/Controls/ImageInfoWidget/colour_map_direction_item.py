@@ -63,22 +63,24 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         self.image = img
         if img is not None:
             img.image_plot.set_colour_map(self.getLookupTable())
-            # TODO: apply the offset??
-
-    def gradientChanged(self):
-        if self.image is not None:
-            # send function pointer, not the result
-            self.image.image_plot.set_colour_map(self.getLookupTable())
 
         self.lut = None
-        # self.sigLookupTableChanged.emit(self)
 
-    def getLookupTable(self, img=None, n=None, alpha=True):
+    def gradientChanged(self):
+        # if self.image is not None:
+        #     # send function pointer, not the result
+        #     self.image.image_plot.set_colour_map(self.getLookupTable())
+        #
+        # self.lut = None
+        # # self.sigLookupTableChanged.emit(self)
+        return
+
+    def getLookupTable(self, img=None, n=None, alpha=True, original=False):
         if n is None:
             n = 256
 
         if self.lut is None:
-            self.lut = self.gradient.getLookupTable(n, alpha=alpha)
+            self.lut = self.gradient.getLookupTable(n, alpha=alpha, original=True)
         return self.lut
 
     def changeColmap(self, cmap):
@@ -86,6 +88,13 @@ class ColMapDirectionItem(QtWidgets.QWidget):
             self.gradient.changeColmap(cmap)
             self.wheel.set_colour_map(self.getLookupTable())
 
+            self.image.image_plot.set_colour_map(self.getLookupTable(original=True))
+
+        self.lut = None
+
     def updateAngle(self, Angle):
+        if self.image is not None and self.image.image_plot is not None:
+            self.image.image_plot.set_cmap_angle_offset(Angle)
+
         self.gradient.updateAngle(Angle)
-        self.wheel.set_colour_map(self.getLookupTable())
+        self.wheel.set_cmap_angle_offset(Angle)

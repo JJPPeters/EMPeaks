@@ -57,9 +57,21 @@ class HistogramControlWidget(QtWidgets.QWidget):
 
         bcg = self.bar.image.image_plot.BCG
 
+        self.slider_gamma.blockSignals(True)
+        self.slider_contrast.blockSignals(True)
+        self.slider_gamma.blockSignals(True)
+
+        self.brightnessChanged(bcg[0], update=False)
+        self.contrastChanged(bcg[1], update=False)
+        self.gammaChanged(bcg[2], update=False)
+
         self.slider_brightness.setVal(bcg[0]*100)
         self.slider_contrast.setVal(bcg[1]*100)
         self.slider_gamma.setVal(bcg[2]*100)
+
+        self.slider_gamma.blockSignals(False)
+        self.slider_contrast.blockSignals(False)
+        self.slider_gamma.blockSignals(False)
 
         # force this or it doesnt update the values properly (and ends up applying them between images)
         self.bar.updateBCG(self.B, self.C, self.G)

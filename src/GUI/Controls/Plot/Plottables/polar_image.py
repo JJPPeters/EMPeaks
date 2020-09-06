@@ -22,6 +22,8 @@ class PolarImagePlot(OglPolarImageTechnique):
 
         self.colour_map = None
 
+        self.cmap_angle_offset = 0.0
+
         # self.current_slice = 0
 
         self.initialise()
@@ -51,5 +53,11 @@ class PolarImagePlot(OglPolarImageTechnique):
     def set_colour_map(self, col_map):
         self.colour_map = col_map
         super(PolarImagePlot, self).set_colour_map(col_map)
+        if self.parent is not None:
+            self.parent.update()
+
+    def set_cmap_angle_offset(self, angle):
+        self.cmap_angle_offset = angle
+        super(PolarImagePlot, self).set_cmap_angle_offset(angle)
         if self.parent is not None:
             self.parent.update()

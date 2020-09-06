@@ -33,12 +33,26 @@ class DirectionControlWidget(QtWidgets.QWidget):
 
     def setImage(self, image):
         self.wheel.setImage(image)
+
+        if image is None:
+            return
+
+        a_o = self.wheel.image.image_plot.angle_offset
+
+        self.slider_angle.blockSignals(True)
+
+        self.angleChanged(a_o, update=False)
+        self.slider_angle.setVal(a_o * 100)
+
+        self.slider_angle.blockSignals(False)
+
         self.wheel.updateAngle(self.Angle)
 
     # Slot
-    def angleChanged(self, value):
+    def angleChanged(self, value, update=True):
         self.Angle = value
-        self.wheel.updateAngle(self.Angle)
+        if update:
+            self.wheel.updateAngle(self.Angle)
 
     def changeColmap(self, cmap):
         self.wheel.changeColmap(cmap)

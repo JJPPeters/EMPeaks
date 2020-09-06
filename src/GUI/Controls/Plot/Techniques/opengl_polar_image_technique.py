@@ -104,6 +104,12 @@ class OglPolarImageTechnique:
             tile.min = levels[0]
             tile.max = levels[1] - levels[0]
 
+    def set_cmap_angle_offset(self, angle):
+        angle = np.deg2rad(angle)
+
+        for tile in self.techniques:
+            tile.angle_offset = angle
+
     @property
     def visible(self):
         return self._visible

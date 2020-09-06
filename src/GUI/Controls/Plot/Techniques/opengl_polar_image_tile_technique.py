@@ -29,6 +29,7 @@ class OglPolarImageTileTechnique(OglTechnique):
 
         self.min_location = None
         self.max_location = None
+        self.angle_offset_location = None
 
         self.colourmap_location = None
         self.texture_angle_location = None
@@ -37,6 +38,8 @@ class OglPolarImageTileTechnique(OglTechnique):
 
         self.min = 0.0
         self.max = 1.0
+
+        self.angle_offset = 0
 
         self.z_location = None
         if z_value < 1:
@@ -75,6 +78,7 @@ class OglPolarImageTileTechnique(OglTechnique):
 
         self.min_location = self.get_uniform_location("magnitude_min")
         self.max_location = self.get_uniform_location("magnitude_max")
+        self.angle_offset_location = self.get_uniform_location("angle_offset")
 
         self.colourmap_location = self.get_uniform_location("colour_map")
 
@@ -172,6 +176,8 @@ class OglPolarImageTileTechnique(OglTechnique):
 
         gl.glUniform1f(self.min_location, self.min)
         gl.glUniform1f(self.max_location, self.max)
+        gl.glUniform1f(self.angle_offset_location, self.angle_offset)
+
         gl.glUniform1i(self.texture_angle_location, self.angle_buffer.unit)
         gl.glUniform1i(self.texture_magnitude_location, self.magnitude_buffer.unit)
         gl.glUniform1i(self.texture_alpha_location, self.alpha_buffer.unit)

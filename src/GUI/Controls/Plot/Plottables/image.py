@@ -21,10 +21,9 @@ class ImagePlot(OglImageTechnique):
         # this provides the contrast limits (and a history so we can 'undo' it)
         self.limitsHistory = [(0., 1.)]
         # this is used to set the brightness, contrast and gamma of the image
-        self.BCG = [0.5, 0.5, 0.5]
-        # this is the name of the colour map!
+        self.BCG = np.array([0.5, 0.5, 0.5])
+        # this is the colour map (rgba) array!
         self.colour_map = None
-
 
         self.current_slice = 0
 
@@ -94,9 +93,15 @@ class ImagePlot(OglImageTechnique):
             self.complex_display = complex_type
             self.update_display()
 
-    def set_colour_map(self, col_map):
+    def set_colour_map(self, col_map: np.ndarray):
         self.colour_map = col_map
         super(ImagePlot, self).set_colour_map(col_map)
+        if self.parent is not None:
+            self.parent.update()
+
+    def set_bcg(self, b, c, g):
+        self.BCG = np.array([b, c, g])
+        super(ImagePlot, self).set_bcg(b, c, g)
         if self.parent is not None:
             self.parent.update()
 

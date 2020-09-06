@@ -25,6 +25,7 @@ uniform sampler2D tex_unit_alpha;
 
 uniform float magnitude_min;
 uniform float magnitude_max;
+uniform float angle_offset;
 
 uniform vec4 colour_map[256];
 
@@ -36,8 +37,16 @@ void main()
     float mag = texture(tex_unit_magnitude, theCoords).r;
     mag = clamp((mag - magnitude_min) / magnitude_max, 0.0, 1.0);
 
-    float ang = texture(tex_unit_angle, theCoords).r;
-    ang = clamp(ang / 6.2831853076, 0.0, 1.0);
+    float ang = texture(tex_unit_angle, theCoords).r + angle_offset;
+    
+    float two_pi = 6.2831853076;
+    
+    if (ang < 0.0)
+        ang += two_pi;
+    else if (ang >= two_pi)
+        ang -= two_pi;
+    
+    ang = clamp(ang / two_pi, 0.0, 1.0);
 
     float alpha = texture(tex_unit_alpha, theCoords).r;
 

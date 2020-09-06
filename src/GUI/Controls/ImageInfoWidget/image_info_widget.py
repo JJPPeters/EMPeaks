@@ -133,13 +133,11 @@ class ImageInfoWidget(QtWidgets.QWidget):
             self.colMapDirection.hide()
             self.colMapDirection.setImage(None)
             self.colMapHistogram.setImage(image)
-            self.changeColMap(image.image_plot.colour_map)
             self.colMapHistogram.show()
         elif isinstance(image.image_plot, PolarImagePlot):
             self.colMapHistogram.hide()
             self.colMapHistogram.setImage(None)
             self.colMapDirection.setImage(image)
-            self.changeColMap(image.image_plot.colour_map)
             self.colMapDirection.show()
 
     def updateItemList(self, image):
@@ -263,11 +261,3 @@ class ImageInfoWidget(QtWidgets.QWidget):
         else:
             self.colMapHistogram.changeColmap(cmap[1])
             self.colMapDirection.changeColmap(cmap[1])
-
-    # def changeDirectionMap(self, cmap):
-    #     # until this point, the colourmap stil contains what submenu it is in, strip it off here (hence the [1])
-    #     self.colMapDirection.changeColmap(cmap[1])
-    #
-    # def changeHistogramMap(self, cmap):
-    #     # until this point, the colourmap stil contains what submenu it is in, strip it off here (hence the [1])
-    #     self.colMapDirection.changeColmap(cmap[1])

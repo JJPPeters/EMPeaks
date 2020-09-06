@@ -175,7 +175,7 @@ class GradientItem(QtWidgets.QGraphicsView):
         for i, j, k, l, m in zip(p, r, g, b, a):
             self.origStops.append([i, [j, k, l, m]])
 
-        self.stops = self.origStops
+        self.stops = self.origStops.copy()
 
     def updateBCG(self, B, C, G):
         self.B = B
@@ -205,8 +205,7 @@ class GradientItem(QtWidgets.QGraphicsView):
         b = self.b_interp(grid)
         a = self.a_interp(grid)
 
-        self.stops = [[i, [j, k, l, m]]
-                      for i, j, k, l, m in zip(p, r, g, b, a)]
+        self.stops = [[i, [j, k, l, m]] for i, j, k, l, m in zip(p, r, g, b, a)]
 
         self.updateGradient()
 
@@ -225,7 +224,7 @@ class GradientItem(QtWidgets.QGraphicsView):
 
         self.updateGradient()
 
-    def getLookupTable(self, nPts, alpha=False):
+    def getLookupTable(self, nPts, alpha=False, original=False):
         if alpha:
             table = np.empty((nPts, 4), dtype=np.ubyte)
         else:
@@ -233,36 +232,40 @@ class GradientItem(QtWidgets.QGraphicsView):
 
         for i in range(nPts):
             x = float(i)/(nPts-1)
-            color = self.getColor(x, toQColor=False)
+            color = self.getColor(x, toQColor=False, original=original)
             table[i] = color[:table.shape[1]]
 
         return table
 
-    def getColor(self, x, toQColor=True):
-        stops = self.stops
+    def getColor(self, x, toQColor=True, original=False):
+        if original:
+            stops = self.origStops
+        else:
+            stops = self.stops
+
         if x <= stops[0][0]:
             c = stops[0][1]
             if toQColor:
                 # always copy colors before handing them out
                 return QtGui.QColor(c)
             else:
-                return (c[0], c[1], c[2], c[3])
+                return c[0], c[1], c[2], c[3]
         if x >= stops[-1][0]:
             c = stops[-1][1]
             if toQColor:
                 # always copy colors before handing them out
                 return QtGui.QColor(c)
             else:
-                return (c[0], c[1], c[2], c[3])
+                return c[0], c[1], c[2], c[3]
 
         x2 = stops[0][0]
         for i in range(1, len(stops)):
             x1 = x2
             x2 = stops[i][0]
-            if x1 <= x and x2 >= x:
+            if x1 <= x <= x2:
                 break
 
-        dx = (x2-x1)
+        dx = x2 - x1
         if dx == 0:
             f = 0.
         else:

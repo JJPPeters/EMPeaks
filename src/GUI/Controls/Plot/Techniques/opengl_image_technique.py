@@ -87,6 +87,15 @@ class OglImageTechnique:
         for tile in self.techniques:
             tile.colour_map = col_map / 255
 
+    def set_bcg(self, b, c, g):
+        bb = 1.5 - (b * 2)
+        cc = 5 ** (4 * (c - 0.5))
+        gg = 10 ** (4 * (-g + 0.5))
+
+        bcg = np.array([bb, cc, gg])
+        for tile in self.techniques:
+            tile.bcg = bcg
+
     def set_levels(self, levels):
         for tile in self.techniques:
             tile.min = levels[0]
