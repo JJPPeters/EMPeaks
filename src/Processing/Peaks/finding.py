@@ -6,6 +6,8 @@ from scipy.spatial.distance import cdist
 from skimage.feature import peak_local_max
 from sklearn.cluster import KMeans
 
+from scipy import ndimage
+
 
 def detect_local_maxima(img, min_dist=0, thresh=0.0):
     image = img.copy()
@@ -29,7 +31,8 @@ def detect_local_maxima(img, min_dist=0, thresh=0.0):
 def cluster_peaks_by_intensity(data, ps, clusters=5):
     new_points = ps.copy()
     psi = new_points.astype(np.int)
-    vals = data[psi[:, 0], psi[:, 1]]
+    median_data = ndimage.median_filter(data, size=3)
+    vals = median_data[psi[:, 0], psi[:, 1]]
 
     kmeans = KMeans(n_clusters=clusters, random_state=0).fit(vals.reshape(-1, 1))
 
