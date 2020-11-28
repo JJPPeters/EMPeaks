@@ -3,7 +3,8 @@ import numpy as np
 
 from .gradient_item import GradientItem
 from .static_view_box import StaticViewBox
-from GUI.Controls.Plot.Plottables import PolarImagePlot
+from GUI.Controls.Plot.Plottables import PolarImagePlot, PolarHistogramPlot
+from Processing.Utilities import get_grid_sample_spacing, normalise_copy
 
 
 class ColMapDirectionItem(QtWidgets.QWidget):
@@ -30,18 +31,22 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         self.layout.addWidget(self.vb, 0, 0)
         self.layout.addWidget(self.gradient, 1, 0)
 
-        if image is not None:
-            self.setImage(image)
+        r = 128
+        res = r * 2
+        max_wheel_r = 100
+
+        self.polar_hist = PolarHistogramPlot(np.array([0.0, 1.0]), np.array([0]), min_r=max_wheel_r, max_r=r, mid = np.array([res, res]) / 2, fill_colour=np.array([255, 255, 255, 200]),
+                                  border_width=0, border_colour=np.array([255, 255, 255, 0]), z_value=1, visible=True)
 
         # Create the wheel image
-        res = 256
         alpha = np.zeros((res, res), dtype=np.int8)
         xx, yy = np.mgrid[:res, :res]
-        xx -= int(res / 2)
-        yy -= int(res / 2)
+        xx -= r
+        yy -= r
         radius = np.square(xx) + np.square(yy)
         # divide by 2.5 is to give a bit of a border at the edge
-        alpha[radius < np.square(res / 2.5)] = 1
+        # alpha[radius < np.square(res / 2.5)] = 1
+        alpha[radius < np.square(max_wheel_r)] = 1
 
         radius = radius.astype(np.float32)
 
@@ -55,16 +60,43 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         self.wheel = PolarImagePlot(angle, radius, alpha)
         self.wheel.set_colour_map(self.getLookupTable())
         self.vb.plot_view.add_widget(self.wheel)
+        self.vb.plot_view.add_widget(self.polar_hist)
         self.vb.plot_view.fit_view()
+
+        if image is not None:
+            self.setImage(image)
 
         self.gradient.sigGradientChanged.connect(self.gradientChanged)
 
     def setImage(self, img):
         self.image = img
-        if img is not None:
-            img.image_plot.set_colour_map(self.getLookupTable())
+        if img is not None and img.image_plot is not None:
+            # TODO: orignally this as here. very odd
+            # img.image_plot.set_colour_map(self.getLookupTable())
+
+            if img.image_plot.colour_map is not None:
+                self.changeColmap(img.image_plot.colour_map)
+
+            self.set_angle_histogram()
 
         self.lut = None
+
+    def set_angle_histogram(self):
+
+        intens = self.image.image_plot.angle_data
+
+        target_sample_size = 5e5
+        if intens.size < target_sample_size:
+            hist_sample = intens
+        else:
+            sample_factor = int(np.sqrt(intens.size / target_sample_size))
+            hist_sample = get_grid_sample_spacing(intens, sample_factor)
+
+        hist = np.histogram(hist_sample, bins=180, range=(0, 2 * np.pi))
+
+        self.polar_hist.set_data(normalise_copy(hist[1]), normalise_copy(hist[0]))
+        self.vb.plot_view.fit_view()
+        self.vb.update()
 
     def gradientChanged(self):
         # if self.image is not None:

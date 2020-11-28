@@ -6,7 +6,7 @@ from GUI.Controls.Plot.Techniques import OglQuadrilateralTechnique
 
 
 class PolarHistogramPlot(HistogramPlot):
-    def __init__(self, bin_edges, frequency, fill_colour=np.zeros((4, )), border_colour=np.ones((4, )), border_width=2,
+    def __init__(self, bin_edges, frequency, min_r=0.0, max_r=1.0, mid=np.zeros((2, )), fill_colour=np.zeros((4, )), border_colour=np.ones((4, )), border_width=2,
                  z_value=1, visible=True):
 
         super(PolarHistogramPlot, self).__init__(None, None,
@@ -18,6 +18,10 @@ class PolarHistogramPlot(HistogramPlot):
 
         self.plot_type = AnnotationType.PolarHistogram
 
+        self.min_r = min_r
+        self.max_r = max_r
+        self.mid = mid
+
         if bin_edges is not None and frequency is not None:
             self.set_data(bin_edges, frequency)
 
@@ -25,14 +29,13 @@ class PolarHistogramPlot(HistogramPlot):
         x = radius * np.cos(theta)
         y = radius * np.sin(theta)
         p = np.array([x, y])
-        return (p + 1) / 2
+        return p + self.mid
 
     @property
     def limits(self):
         return np.array([1.0, 0.0, 0.0, 1.0], dtype=np.float32)
 
-    def set_data(self, edges, frequency, min_r=0.0):
-        max_r = 1.0
+    def set_data(self, edges, frequency):
         # this is where we make the difference
         # use our x,y as polar and convert to cartesian
 
@@ -45,7 +48,7 @@ class PolarHistogramPlot(HistogramPlot):
         if frequency.max() > 0:
             frequency = frequency - frequency.min()
             frequency = frequency / frequency.max()
-            frequency = frequency * (max_r - min_r) + min_r
+            frequency = frequency * (self.max_r - self.min_r) + self.min_r
 
         # get number of bins for convenience
         n_bins = edges.size - 1
@@ -65,7 +68,7 @@ class PolarHistogramPlot(HistogramPlot):
             t1 = edges[i]
             t2 = edges[i+1]
 
-            r1 = min_r
+            r1 = self.min_r
             r2 = frequency[i]
 
             p1 = self.p_to_c(r1, t1)
