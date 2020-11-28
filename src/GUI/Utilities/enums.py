@@ -11,6 +11,7 @@ class AnnotationType(Enum):
     Quiver = 'Quiver'
     Line = 'Line'
     Histogram = 'Histogram'
+    PolarHistogram = 'Polar Histogram'
 
 
 # 'enum' to determine image display type

@@ -1,5 +1,5 @@
 from .opengl_plot_widget import GLPlotWidget
-from .opengl_rectangle_technique import OglRectangleTechnique
+from .opengl_quadrilateral_technique import OglQuadrilateralTechnique
 from .opengl_scatter_technique import OglScatterTechnique
 from .opengl_quiver_technique import OglQuiverTechnique
 from .opengl_image_technique import OglImageTechnique

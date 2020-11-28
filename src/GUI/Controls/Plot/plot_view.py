@@ -4,8 +4,8 @@ from PyQt5.QtWidgets import QApplication
 import numpy as np
 
 from .Techniques.opengl_camera import OglCamera
-from .Techniques.opengl_rectangle_technique import OglRectangleTechnique
-
+from GUI.Controls.Plot.Plottables import Rectangle
+from PyQt5.QtWidgets import QOpenGLWidget
 
 class PlotView(QtCore.QObject):
     signal_mouse_moved = QtCore.pyqtSignal(float, float)
@@ -18,7 +18,7 @@ class PlotView(QtCore.QObject):
     def __init__(self, t, l, b, r, image_axes=True):
         super(PlotView, self).__init__()
 
-        self.parent = None
+        self._parent = None
 
         # sets if the axes have the same scale, i.e. to preserve pixel square-ness in images
         self.equal_axes_scale = image_axes
@@ -29,10 +29,10 @@ class PlotView(QtCore.QObject):
 
         self.widgets = []
 
-        self.selection_rect = OglRectangleTechnique(visible=False,
-                                                    fill_colour=np.array([233, 142, 34, 100]) / 255,
-                                                    border_colour=np.array([233, 142, 34, 255]) / 255,
-                                                    border_width=1, z_value=999)
+        self.selection_rect = Rectangle(visible=False,
+                                        fill_colour=np.array([233, 142, 34, 100]) / 255,
+                                        border_colour=np.array([233, 142, 34, 255]) / 255,
+                                        border_width=1, z_value=999)
 
         #
         # Mouse moving stuffs
@@ -44,13 +44,21 @@ class PlotView(QtCore.QObject):
         self.mouse_is_dragging = None
         self.mouse_drag_modifiers = None
 
+    @property
+    def parent(self: QOpenGLWidget):
+        return self._parent
+
+    @parent.setter
+    def parent(self, p: QOpenGLWidget):
+        self._parent = p
+        self.selection_rect.parent = p
+
     def initialise(self):
         for w in self.widgets:
             w.initialise()
 
-        self.selection_rect.parent = self.parent
-        # self.selection_rect.initialise()
-        self.selection_rect.make_buffers(0,0,0,0)
+        self.selection_rect.initialise()
+        # self.selection_rect.set_data(0,0,0,0)
 
     @property
     def draw_range_x(self):
@@ -210,7 +218,7 @@ class PlotView(QtCore.QObject):
             else:
                 widge.selected = False
 
-        self.selection_rect.update_buffers(0, 0, 0, 0)
+        self.selection_rect.set_data(0, 0, 0, 0)
 
         return self
 
@@ -267,7 +275,7 @@ class PlotView(QtCore.QObject):
             right = max(start_pos[0], current_pos[0])
 
             self.selection_rect.visible = True
-            self.selection_rect.update_buffers(top, left, bottom, right)
+            self.selection_rect.set_data(top, left, bottom, right)
 
         elif not modifiers & QtCore.Qt.ControlModifier \
                 and self.mouse_drag_modifiers & QtCore.Qt.ControlModifier:

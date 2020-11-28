@@ -1,6 +1,7 @@
 import numpy as np
 
-from GUI.Controls.Plot.Techniques import OglRectangleTechnique, OglLineTechnique
+from GUI.Controls.Plot.Techniques import OglLineTechnique
+from GUI.Controls.Plot.Plottables import Rectangle
 from PyQt5.QtWidgets import QOpenGLWidget
 from GUI.Utilities.enums import AnnotationType
 
@@ -66,12 +67,11 @@ class HistogramPlot:
 
         self.bars = []
         for i in range(n_bins):
-            rect = OglRectangleTechnique(fill_colour=self.fill_colour / 255,
-                                         border_colour=np.zeros((4, )),
-                                         border_width=0, z_value=self.z_value, visible=self.visible)
-            rect.parent = self._parent
-            rect.initialise()
-            rect.make_buffers(frequency[i], edges[i], 0.0, edges[i+1])
+            rect_edges = [frequency[i], edges[i], 0.0, edges[i+1]]
+            rect = Rectangle(limits=rect_edges, fill_colour=self.fill_colour / 255,
+                             border_colour=np.zeros((4, )),
+                             border_width=0, z_value=self.z_value, visible=self.visible)
+            rect.parent = self._parent  # important as these are created after the rest of this has been initialised
             self.bars.append(rect)
 
         # self.outline = OglLineTechnique(thickness=self.border_width, colour=self.border_colour / 255,

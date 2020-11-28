@@ -12,10 +12,6 @@ import numpy as np
 
 import scipy.misc
 
-from .opengl_image_technique import OglImageTechnique
-from .opengl_scatter_technique import OglScatterTechnique
-from .opengl_rectangle_technique import OglRectangleTechnique
-from .opengl_line_technique import OglLineTechnique
 from .opengl_camera import OglCamera
 
 from .opengl_framebuffer import OglFramebuffer

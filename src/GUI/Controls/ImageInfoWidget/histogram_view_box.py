@@ -55,7 +55,7 @@ class HistogramViewBox(PlotWidget):
         left = np.min([self.mouse_down_pos, ev.pos().x()]) / self.width()
         right = np.max([self.mouse_down_pos, ev.pos().x()]) / self.width()
 
-        self.plot_view.selection_rect.update_buffers(10, left, -10, right)
+        self.plot_view.selection_rect.set_data(10, left, -10, right)
         self.update()
 
     def wheelEvent(self, event):

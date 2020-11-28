@@ -1,7 +1,7 @@
 import numpy as np
 
 from GUI.Controls.Plot.Techniques import OglScatterTechnique
-from GUI.Controls.Plot.Techniques import OglRectangleTechnique
+from GUI.Controls.Plot.Plottables import Rectangle
 
 
 class RectAnnotation:
@@ -18,16 +18,15 @@ class RectAnnotation:
         #
         self.roi_handles = []
         for i in range(4):
-            s = OglScatterTechnique(size=15, border_width=0, fill_colour=self.handle_colour, z_value=999, visible=False)
+            s = OglScatterTechnique(size_x=15, border_width=0, fill_colour=self.handle_colour, z_value=999, visible=False)
             s.initialise()
             s.make_buffers(np.array([0, 0]).reshape((1, 2)))
             self.roi_handles.append(s)
 
             self._view.add_item(s)
 
-        self.roi_rect = OglRectangleTechnique(fill_colour=self.roi_fill_colour, border_colour=self.roi_border_colour, z_value=998)
+        self.roi_rect = Rectangle(limits=[0, 0, 0, 0], fill_colour=self.roi_fill_colour, border_colour=self.roi_border_colour, z_value=998)
         self.roi_rect.initialise()
-        self.roi_rect.make_buffers(0, 0, 0, 0)
 
         self._view.add_item(self.roi_rect)
 
