@@ -332,6 +332,6 @@ class FileMenu(MenuEntry):
 
                     image_window.add_plottable(k, quiver_annotation)
 
-        self.master.Children[image_id] = image_window
+        self.master.children[image_id] = image_window
         self.master.set_console_message("Opened file \"" + title, Console.Success,
                                         image=image_window)

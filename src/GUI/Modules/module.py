@@ -41,6 +41,10 @@ class Module:
         if self.main_window is not None:
             return self.main_window.last_active
 
+    def open_image_window_ids(self):
+        if self.main_window is not None:
+            return list(self.main_window.children.keys())
+
     # TODO: get this to work when return size is different?
     def perform_on_image(self, func, update=True, keep_view=True):
         image = np.array(self.main_window.last_active.image_plot.image_data)

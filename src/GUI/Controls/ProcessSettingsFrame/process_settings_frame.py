@@ -67,6 +67,9 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
                                                             checked=v[3])
             elif v[0] == "Slider":
                 return
+            elif v[0] == "LineEdit":
+                self.controls[v[2]] = self.ui.add_line_text_box(name=v[2],
+                                                                text=v[3])
 
         if self.function is not None:
             self.sigApplyFilter.connect(self.function)
@@ -85,6 +88,8 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
                 control_values[key] = value.currentText()
             elif isinstance(value, QtWidgets.QCheckBox):
                 control_values[key] = value.isChecked()
+            elif isinstance(value, QtWidgets.QLineEdit):
+                control_values[key] = value.text()
             elif isinstance(value, QtWidgets.QListWidget):
                 # remembering that we want checked items, NOT selected ones
                 checked_items = []

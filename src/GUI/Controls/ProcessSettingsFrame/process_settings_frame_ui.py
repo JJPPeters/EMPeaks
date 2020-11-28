@@ -192,3 +192,22 @@ class ProcessSettingsFrameUi(object):
         check_box.stateChanged.connect(self.filter_widget.on_control_changed)
 
         return check_box
+
+    def add_line_text_box(self, name="Line Edit", text=""):
+        name += ":"
+
+        vert_control_layout = QtWidgets.QVBoxLayout()
+
+        lbl_line_text_box = QtWidgets.QLabel(self.filter_widget)
+        vert_control_layout.addWidget(lbl_line_text_box)
+        lbl_line_text_box.setText(name)
+
+        line_text_box = QtWidgets.QLineEdit(self.filter_widget)
+        line_text_box.setText(text)
+
+        vert_control_layout.addWidget(line_text_box)
+        self.vert_control_layout.addLayout(vert_control_layout)
+
+        line_text_box.textChanged.connect(self.filter_widget.on_control_changed)
+
+        return line_text_box

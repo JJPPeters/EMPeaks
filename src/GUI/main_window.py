@@ -27,7 +27,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.modules = []
 
-        self.Children = {}
+        self.children = {}
         self._lastActive = None
         self.dialogGeom = None
         self.last_directory = os.path.expanduser("~")
@@ -99,7 +99,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 pref, let = divmod(pref, 27)
                 key = string.ascii_uppercase[let - 1] + key
 
-            if key not in self.Children:
+            if key not in self.children:
                 return key
             i += 1
 
@@ -156,13 +156,13 @@ class MainWindow(QtWidgets.QMainWindow):
         new_image_window.set_image_plot(image_plot)
 
         # update our records
-        self.Children[window_id] = new_image_window
+        self.children[window_id] = new_image_window
 
-        return self.Children[window_id]
+        return self.children[window_id]
 
     def remove_image(self, id):
-        if id in self.Children:
-            self.Children.pop(id)
+        if id in self.children:
+            self.children.pop(id)
 
         self.last_active = None
 
@@ -222,7 +222,7 @@ class MainWindow(QtWidgets.QMainWindow):
     # Qt function
     def closeEvent(self, event):
         # When the main window closes, we want to close all other windows
-        keys = list(self.Children.keys())  # need to make a copy
+        keys = list(self.children.keys())  # need to make a copy
         for k in keys:
-            self.Children[k].close()
+            self.children[k].close()
         super(MainWindow, self).closeEvent(event)
