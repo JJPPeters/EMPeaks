@@ -3,6 +3,7 @@ from .opengl_quadrilateral_technique import OglQuadrilateralTechnique
 from .opengl_scatter_technique import OglScatterTechnique
 from .opengl_quiver_technique import OglQuiverTechnique
 from .opengl_image_technique import OglImageTechnique
+from .opengl_circle_technique import OglCircleTechnique
 from .opengl_polar_image_technique import OglPolarImageTechnique
 from .opengl_line_technique import OglLineTechnique
 from .opengl_text_technique import OglTextTechnique

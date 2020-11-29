@@ -10,8 +10,6 @@ class HistogramViewBox(PlotWidget):
     def __init__(self, *args, **kwds):
         super(HistogramViewBox, self).__init__(*args, **kwds)
 
-        # self.plot_view.view_camera.invert_y = True
-
         self.setInvertY(True)
 
         self.mouse_down_pos = None
@@ -34,8 +32,6 @@ class HistogramViewBox(PlotWidget):
         self.update()
 
     def mouseMoveEvent(self, ev):
-        dx = 0.0
-
         if ev.buttons() == QtCore.Qt.LeftButton:
             dx = ev.pos().x() - self.mouse_down_pos
             do_x = abs(dx)
@@ -52,6 +48,7 @@ class HistogramViewBox(PlotWidget):
         # draw our selection rect
         self.plot_view.selection_rect.visible = True
 
+        # note that this only works because this is set to be a view range of 0 to 1
         left = np.min([self.mouse_down_pos, ev.pos().x()]) / self.width()
         right = np.max([self.mouse_down_pos, ev.pos().x()]) / self.width()
 

@@ -6,10 +6,11 @@ from .shaders import circle_shaders as shaders
 
 import numpy as np
 
+
 # TODO: this is very similar to the scatter plot at the moment. I think my general plan is to have this be able to have different colours/sizes etc per item, whereas scatter is consistent
 class OglCircleTechnique(OglTechnique):
 
-    def __init__(self, fill_colour=np.zeros((4, )), border_colour=np.ones((4, )), ring_frac=0, border_width=2,
+    def __init__(self, fill_colour=np.zeros((4, )), border_colour=np.ones((4, )), ring_frac=0.0, border_width=2,
                  z_value=1, visible=True):
         super(OglCircleTechnique, self).__init__()
 

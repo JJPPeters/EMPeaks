@@ -10,7 +10,7 @@ from GUI.Utilities.enums import AnnotationType
 
 class LinePlot(OglLineTechnique, QtCore.QObject):
     def __init__(self, points=None, points_y=None, thickness=1, colour=None, z_value=1, visible=True):
-        super(LinePlot, self).__init__(thickness=thickness, colour=colour, z_value=z_value, visible=visible)
+        super(LinePlot, self).__init__(thickness=thickness, colour=colour / 255, z_value=z_value, visible=visible)
 
         self.plot_type = AnnotationType.Line
 

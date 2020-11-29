@@ -3,7 +3,7 @@ import numpy as np
 
 from .gradient_item import GradientItem
 from .static_view_box import StaticViewBox
-from GUI.Controls.Plot.Plottables import PolarImagePlot, PolarHistogramPlot
+from GUI.Controls.Plot.Plottables import PolarImagePlot, PolarHistogramPlot, HistogramPlot, LinePlot
 from Processing.Utilities import get_grid_sample_spacing, normalise_copy
 
 
@@ -21,6 +21,7 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         self.layout.setSpacing(0)
 
         self.vb = StaticViewBox()
+        self.vb.setInvertY(True)
         # self.vb.setBackgroundColor(QtGui.QColor(0, 0, 0, 255))
         # self.vb.autoRange(padding=0.01)  # to get image ot fit later
         # self.vb.setAspectLocked(True)
@@ -34,8 +35,16 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         r = 128
         res = r * 2
 
-        self.polar_hist = PolarHistogramPlot(np.array([0.0, 1.0]), np.array([0]), min_r=1.0, max_r=1.2, fill_colour=np.array([255, 255, 255, 200]),
+        self.polar_hist = PolarHistogramPlot(np.array([0.0, 1.0]), np.array([0]), min_r=1.0, max_r=1.2, fill_colour=np.array([147, 41, 132, 200]),
+                                  border_width=2, border_colour=np.array([189, 48, 171, 255]), z_value=1, visible=True)
+
+        self.mag_hist = HistogramPlot(np.array([0.0, 1.0]), np.array([0]), fill_colour=np.array([255, 255, 255, 120]),
                                   border_width=2, border_colour=np.array([255, 255, 255, 255]), z_value=1, visible=True)
+
+        self.hist_x_line = LinePlot(np.array([0.0, 1.0]), np.array([0.0, 0.0]),
+                                    thickness=2, colour=np.array([255, 255, 255, 255]), z_value=2)
+        # self.hist_y_line = LinePlot(np.array([0.0, 0.0]), np.array([0.0, 1.0]),
+        #                             thickness=2, colour=np.array([200, 200, 200, 255]), z_value=2)
 
         # Create the wheel image
         alpha = np.zeros((res, res), dtype=np.int8)
@@ -60,6 +69,9 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         self.wheel.set_colour_map(self.getLookupTable())
         self.vb.plot_view.add_widget(self.wheel)
         self.vb.plot_view.add_widget(self.polar_hist)
+        self.vb.plot_view.add_widget(self.mag_hist)
+        self.vb.plot_view.add_widget(self.hist_x_line)
+        # self.vb.plot_view.add_widget(self.hist_y_line)
 
         if image is not None:
             self.setImage(image)
@@ -92,9 +104,12 @@ class ColMapDirectionItem(QtWidgets.QWidget):
             sample_factor = int(np.sqrt(intens.size / target_sample_size))
             hist_sample = get_grid_sample_spacing(intens, sample_factor)
 
-        hist = np.histogram(hist_sample, bins=180, range=(0, 2 * np.pi))
+        ang_hist = np.histogram(hist_sample, bins=180, range=(0, 2 * np.pi))
 
-        self.polar_hist.set_data(normalise_copy(hist[1]), normalise_copy(hist[0]))
+        mag_hist = np.histogram(hist_sample, bins=180, range=(0, 2 * np.pi))
+
+        self.polar_hist.set_data(normalise_copy(ang_hist[1]), normalise_copy(ang_hist[0]))
+        self.mag_hist.set_data(normalise_copy(mag_hist[1]), normalise_copy(mag_hist[0]) / 3)
 
     def gradientChanged(self):
         # if self.image is not None:
