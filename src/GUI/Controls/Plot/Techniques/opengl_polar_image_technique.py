@@ -5,9 +5,13 @@ from .opengl_polar_image_tile_technique import OglPolarImageTileTechnique
 import numpy as np
 from PyQt5.QtWidgets import QOpenGLWidget
 
+
 class OglPolarImageTechnique:
 
-    def __init__(self, z_value=1, visible=True):
+    def __init__(self,
+                 pixel_scale: float = 1.0,
+                 origin=np.array([0.0, 0.0], dtype=np.float32),
+                 z_value=1, visible=True):
         self._parent = None
 
         if z_value < 1:
@@ -20,7 +24,40 @@ class OglPolarImageTechnique:
 
         self._visible = visible
 
-        self.limits = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        # this is the size of the image in pixels, scale of the pixels, and origin (in scaled units)
+        self.image_size = np.array([0.0, 0.0], dtype=np.float32)
+        self._pixel_scale = pixel_scale
+        self._origin = origin
+
+    @property
+    def pixel_scale(self):
+        return self._pixel_scale
+
+    @pixel_scale.setter
+    def pixel_scale(self, ps: float):
+        self._pixel_scale = ps
+        for t in self.techniques:
+            t.pixel_scale = ps
+
+    @property
+    def origin(self):
+        return self._origin
+
+    @origin.setter
+    def origin(self, origin):
+        self._origin = origin
+        for t in self.techniques:
+            t.origin = origin
+
+    @property
+    def limits(self):
+        limits = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        limits[0] = (self.image_size[0] * self.pixel_scale) - self.origin[0]
+        limits[1] = 0 - self.origin[1]
+        limits[2] = 0 - self.origin[0]
+        limits[3] = (self.image_size[1] * self.pixel_scale) - self.origin[1]
+
+        return limits
 
     @property
     def parent(self: QOpenGLWidget):
@@ -47,13 +84,8 @@ class OglPolarImageTechnique:
             # this is the minimum required by OpenGL 3.0
             max_tex_size = 1024
 
-        width = angles.shape[1]
-        height = angles.shape[0]
-
-        self.limits[0] = height
-        self.limits[1] = 0
-        self.limits[2] = 0
-        self.limits[3] = width
+        self.image_size[0] = angles.shape[0]
+        self.image_size[1] = angles.shape[1]
 
         h_sections = np.ceil(angles.shape[1] / max_tex_size).astype(np.int)
         v_sections = np.ceil(angles.shape[0] / max_tex_size).astype(np.int)
@@ -83,7 +115,7 @@ class OglPolarImageTechnique:
 
             for hv_ang, hv_mag, hv_alpha in zip(hv_ang_split, hv_mag_split, hv_alpha_split):
                 technique = OglPolarImageTileTechnique(z_value=self.z_value, visible=self.visible)
-                technique.make_buffers(hv_ang, hv_mag, hv_alpha, h_offset, v_offset, image_min=image_min, image_max=image_max)
+                technique.make_buffers(hv_ang, hv_mag, hv_alpha, h_offset + self.origin[1], v_offset + self.origin[0], pixel_scale=self.pixel_scale, image_min=image_min, image_max=image_max)
                 technique.parent = self.parent
                 self.techniques.append(technique)
 

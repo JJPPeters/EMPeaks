@@ -1,5 +1,6 @@
 import OpenGL.GL as gl
 
+from PyQt5.QtWidgets import QOpenGLWidget
 from .opengl_technique import OglTechnique
 from .opengl_attribute_buffer import OglAttributeBuffer
 from .opengl_texture_buffer import OglTextureBuffer
@@ -10,7 +11,10 @@ import numpy as np
 
 class OglPolarImageTileTechnique(OglTechnique):
 
-    def __init__(self, z_value=1, visible=True):
+    def __init__(self,
+                 pixel_scale=1.0,
+                 origin=np.array([0.0, 0.0], dtype=np.float32),
+                 z_value=1, visible=True):
         super(OglPolarImageTileTechnique, self).__init__()
 
         self.deferred_make_buffer = False
@@ -36,12 +40,15 @@ class OglPolarImageTileTechnique(OglTechnique):
         self.texture_magnitude_location = None
         self.texture_alpha_location = None
 
+        self.z_location = None
+        self.scale_location = None
+        self.origin_location = None
+
         self.min = 0.0
         self.max = 1.0
 
         self.angle_offset = 0
 
-        self.z_location = None
         if z_value < 1:
             z_value = 1
         elif z_value > 999:
@@ -50,13 +57,25 @@ class OglPolarImageTileTechnique(OglTechnique):
 
         self.visible = visible
 
-        self.limits = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        self.image_size = np.array([0.0, 0.0], dtype=np.float32)
+        self.pixel_scale = float(pixel_scale)
+        self.origin = origin.astype(np.float32)
 
         self.colour_map = np.zeros((256, 4), dtype=np.float32)
         self.colour_map[:, 0] = np.linspace(0, 1, 256)
         self.colour_map[:, 1] = np.linspace(0, 1, 256)
         self.colour_map[:, 2] = np.linspace(0, 1, 256)
         self.colour_map[:, 3] = 1
+
+    @property
+    def limits(self: QOpenGLWidget):
+        limits = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        limits[0] = (self.image_size[0] * self.pixel_scale) - self.origin[0]
+        limits[1] = 0 - self.origin[1]
+        limits[2] = 0 - self.origin[0]
+        limits[3] = (self.image_size[1] * self.pixel_scale) - self.origin[1]
+
+        return limits
 
     def initialise(self):
         if self.texture_angle_location is not None:
@@ -75,6 +94,8 @@ class OglPolarImageTileTechnique(OglTechnique):
         self.projection_location = self.get_uniform_location("projection")
 
         self.z_location = self.get_uniform_location("z_value")
+        self.origin_location = self.get_uniform_location("origin")
+        self.scale_location = self.get_uniform_location("scale")
 
         self.min_location = self.get_uniform_location("magnitude_min")
         self.max_location = self.get_uniform_location("magnitude_max")
@@ -93,7 +114,7 @@ class OglPolarImageTileTechnique(OglTechnique):
             self._make_buffers()
             self.deferred_make_buffer = False
 
-    def make_buffers(self, angle, magnitude, alpha=None, h_o=0, v_o=0, image_min=None, image_max=None):
+    def make_buffers(self, angle, magnitude, alpha=None, h_o=0, v_o=0, pixel_scale=1.0, image_min=None, image_max=None):
         # first we need to get a buffer of intensities
         if image_min is None:
             self.min = np.min(magnitude)
@@ -105,13 +126,10 @@ class OglPolarImageTileTechnique(OglTechnique):
         else:
             self.max = image_max
 
-        width = angle.shape[1]
-        height = angle.shape[0]
-
-        self.limits[0] = height + v_o
-        self.limits[1] = h_o
-        self.limits[2] = v_o
-        self.limits[3] = width + h_o
+        self.image_size[0] = angle.shape[0]
+        self.image_size[1] = angle.shape[1]
+        self.pixel_scale = float(pixel_scale)
+        self.origin = np.array([v_o, h_o], dtype=np.float32)
 
         self.deferred_angle = angle
         self.deferred_magnitude = magnitude
@@ -123,10 +141,10 @@ class OglPolarImageTileTechnique(OglTechnique):
             self.deferred_make_buffer = True
 
     def _make_buffers(self):
-        t = self.limits[0]
-        l = self.limits[1]
-        b = self.limits[2]
-        r = self.limits[3]
+        t = self.image_size[0]
+        l = 0
+        b = 0
+        r = self.image_size[1]
 
         positions = np.array([[l, b],
                               [r, b],
@@ -173,6 +191,8 @@ class OglPolarImageTileTechnique(OglTechnique):
         self.set_projection(projection)
 
         gl.glUniform1f(self.z_location, self.z_value)
+        gl.glUniform1f(self.scale_location, self.pixel_scale)
+        gl.glUniform2fv(self.origin_location, 1, self.origin)
 
         gl.glUniform1f(self.min_location, self.min)
         gl.glUniform1f(self.max_location, self.max)

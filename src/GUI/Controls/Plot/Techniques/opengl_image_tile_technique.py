@@ -9,7 +9,10 @@ import numpy as np
 
 class OglImageTileTechnique(OglTechnique):
 
-    def __init__(self, z_value=1, visible=True):
+    def __init__(self,
+                 pixel_scale=1.0,
+                 origin=np.array([0.0, 0.0], dtype=np.float32),
+                 z_value=1, visible=True):
         super(OglImageTileTechnique, self).__init__()
 
         self.deferred_make_buffer = False
@@ -32,10 +35,13 @@ class OglImageTileTechnique(OglTechnique):
         self.colourmap_location = None
         self.texture_unit_location = None
 
+        self.z_location = None
+        self.scale_location = None
+        self.origin_location = None
+
         self.min = 0.0
         self.max = 1.0
 
-        self.z_location = None
         if z_value < 1:
             z_value = 1
         elif z_value > 999:
@@ -44,7 +50,9 @@ class OglImageTileTechnique(OglTechnique):
 
         self.visible = visible
 
-        self.limits = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        self.image_size = np.array([0.0, 0.0], dtype=np.float32)
+        self.pixel_scale = float(pixel_scale)
+        self.origin = origin.astype(np.float32)
 
         self.colour_map = np.zeros((256, 4), dtype=np.float32)
         self.colour_map[:, 0] = np.linspace(0, 1, 256)
@@ -53,6 +61,16 @@ class OglImageTileTechnique(OglTechnique):
         self.colour_map[:, 3] = 1
 
         self.bcg = np.array([0.5, 1.0, 1.0])
+
+    @property
+    def limits(self):
+        limits = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        limits[0] = (self.image_size[0] * self.pixel_scale) - self.origin[0]
+        limits[1] = 0 - self.origin[1]
+        limits[2] = 0 - self.origin[0]
+        limits[3] = (self.image_size[1] * self.pixel_scale) - self.origin[1]
+
+        return limits
 
     def initialise(self):
         if self.texture_unit_location is not None:
@@ -74,6 +92,8 @@ class OglImageTileTechnique(OglTechnique):
         self.projection_location = self.get_uniform_location("projection")
 
         self.z_location = self.get_uniform_location("z_value")
+        self.origin_location = self.get_uniform_location("origin")
+        self.scale_location = self.get_uniform_location("scale")
 
         self.min_location = self.get_uniform_location("image_min")
         self.max_location = self.get_uniform_location("image_max")
@@ -93,7 +113,7 @@ class OglImageTileTechnique(OglTechnique):
             self._make_buffers()
             self.deferred_make_buffer = False
 
-    def make_buffers(self, image, h_o=0, v_o=0, correction=0.5, image_min=None, image_max=None):
+    def make_buffers(self, image, h_o=0, v_o=0, pixel_scale=1.0, correction=0.5, image_min=None, image_max=None):
         # first we need to get a buffer of intensities
         if image_min is None:
             self.min = np.min(image)
@@ -105,16 +125,10 @@ class OglImageTileTechnique(OglTechnique):
         else:
             self.max = image_max
 
-        width = image.shape[1]
-        height = image.shape[0]
-
-        h_o -= correction
-        v_o -= correction
-
-        self.limits[0] = height + v_o
-        self.limits[1] = h_o
-        self.limits[2] = v_o
-        self.limits[3] = width + h_o
+        self.image_size[0] = image.shape[0]
+        self.image_size[1] = image.shape[1]
+        self.pixel_scale = float(pixel_scale)
+        self.origin = np.array([v_o, h_o], dtype=np.float32)
 
         self.deferred_image = image
 
@@ -167,6 +181,8 @@ class OglImageTileTechnique(OglTechnique):
         self.set_projection(projection)
 
         gl.glUniform1f(self.z_location, self.z_value)
+        gl.glUniform1f(self.scale_location, self.pixel_scale)
+        gl.glUniform2fv(self.origin_location, 1, self.origin)
 
         gl.glUniform1f(self.min_location, self.min)
         gl.glUniform1f(self.max_location, self.max)

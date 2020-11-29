@@ -4,6 +4,9 @@ vertex_shader = """
 uniform mat4 projection;
 uniform float z_value;
 
+uniform vec2 origin;
+uniform float scale;
+
 in vec2 rectangle_position;
 in vec2 tex_coords;
 
@@ -11,7 +14,8 @@ out vec2 theCoords;
 
 void main()
 {
-    gl_Position = projection * vec4(rectangle_position, -z_value, 1.0);
+    vec2 new_pos = (rectangle_position * scale) - origin.yx;
+    gl_Position = projection * vec4(new_pos, -z_value, 1.0);
     theCoords = tex_coords;
 }
 """

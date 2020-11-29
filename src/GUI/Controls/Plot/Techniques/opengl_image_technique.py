@@ -8,7 +8,10 @@ import numpy as np
 
 class OglImageTechnique:
 
-    def __init__(self, z_value=1, visible=True):
+    def __init__(self,
+                 pixel_scale: float = 1.0,
+                 origin=np.array([0.0, 0.0], dtype=np.float32),
+                 z_value=1, visible=True):
         self._parent = None
 
         if z_value < 1:
@@ -21,7 +24,40 @@ class OglImageTechnique:
 
         self._visible = visible
 
-        self.limits = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        # this is the size of the image in pixels, scale of the pixels, and origin (in scaled units)
+        self.image_size = np.array([0.0, 0.0], dtype=np.float32)
+        self._pixel_scale = pixel_scale
+        self._origin = origin
+
+    @property
+    def pixel_scale(self):
+        return self._pixel_scale
+
+    @pixel_scale.setter
+    def pixel_scale(self, ps: float):
+        self._pixel_scale = ps
+        for t in self.techniques:
+            t.pixel_scale = ps
+
+    @property
+    def origin(self):
+        return self._origin
+
+    @origin.setter
+    def origin(self, origin):
+        self._origin = origin
+        for t in self.techniques:
+            t.origin = origin
+
+    @property
+    def limits(self):
+        limits = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        limits[0] = (self.image_size[0] * self.pixel_scale) - self.origin[0]
+        limits[1] = 0 - self.origin[1]
+        limits[2] = 0 - self.origin[0]
+        limits[3] = (self.image_size[1] * self.pixel_scale) - self.origin[1]
+
+        return limits
 
     @property
     def parent(self: QOpenGLWidget):
@@ -44,13 +80,8 @@ class OglImageTechnique:
         # need to split image up depending in max texture
         max_tex_size = gl.glGetIntegerv(gl.GL_MAX_TEXTURE_SIZE)
 
-        width = image.shape[1]
-        height = image.shape[0]
-
-        self.limits[0] = height - correction
-        self.limits[1] = 0 - correction
-        self.limits[2] = 0 - correction
-        self.limits[3] = width - correction
+        self.image_size[0] = image.shape[0]
+        self.image_size[1] = image.shape[1]
 
         h_sections = np.ceil(image.shape[1] / max_tex_size).astype(np.int)
         v_sections = np.ceil(image.shape[0] / max_tex_size).astype(np.int)
@@ -71,7 +102,7 @@ class OglImageTechnique:
 
             for hv_im in hv_split:
                 technique = OglImageTileTechnique(z_value=self.z_value, visible=self.visible)
-                technique.make_buffers(hv_im, h_offset, v_offset, correction=correction, image_min=image_min, image_max=image_max)
+                technique.make_buffers(hv_im, h_offset + self.origin[1], v_offset + self.origin[0], correction=correction, image_min=image_min, image_max=image_max)
                 technique.parent = self.parent
                 self.techniques.append(technique)
 
