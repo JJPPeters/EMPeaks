@@ -7,8 +7,13 @@ from GUI.Utilities.enums import ImageType, WindowType, AnnotationType, ComplexDi
 
 
 class ImagePlot(OglImageTechnique):
-    def __init__(self, image=None, z_value=1, visible=True):
-        super(ImagePlot, self).__init__(z_value=z_value, visible=visible)
+    def __init__(self, image=None,
+                 pixel_scale: float = 1.0,
+                 origin=np.array([0.0, 0.0], dtype=np.float32),
+                 z_value=1, visible=True):
+        super(ImagePlot, self).__init__(pixel_scale=pixel_scale,
+                                        origin=origin,
+                                        z_value=z_value, visible=visible)
 
         self.plot_type = AnnotationType.Image
 

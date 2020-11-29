@@ -33,10 +33,9 @@ class ColMapDirectionItem(QtWidgets.QWidget):
 
         r = 128
         res = r * 2
-        max_wheel_r = 100
 
-        self.polar_hist = PolarHistogramPlot(np.array([0.0, 1.0]), np.array([0]), min_r=max_wheel_r, max_r=r, mid = np.array([res, res]) / 2, fill_colour=np.array([255, 255, 255, 200]),
-                                  border_width=0, border_colour=np.array([255, 255, 255, 0]), z_value=1, visible=True)
+        self.polar_hist = PolarHistogramPlot(np.array([0.0, 1.0]), np.array([0]), min_r=1.0, max_r=1.2, fill_colour=np.array([255, 255, 255, 200]),
+                                  border_width=2, border_colour=np.array([255, 255, 255, 255]), z_value=1, visible=True)
 
         # Create the wheel image
         alpha = np.zeros((res, res), dtype=np.int8)
@@ -46,7 +45,7 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         radius = np.square(xx) + np.square(yy)
         # divide by 2.5 is to give a bit of a border at the edge
         # alpha[radius < np.square(res / 2.5)] = 1
-        alpha[radius < np.square(max_wheel_r)] = 1
+        alpha[radius < np.square(r)] = 1
 
         radius = radius.astype(np.float32)
 
@@ -57,11 +56,10 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         angle = np.angle(-xx + 1j * yy, deg=False) - np.pi / 2
         angle[angle < 0] += 2*np.pi
 
-        self.wheel = PolarImagePlot(angle, radius, alpha)
+        self.wheel = PolarImagePlot(angle, radius, alpha, pixel_scale=2 / res, origin=np.array([1.0, 1.0]))
         self.wheel.set_colour_map(self.getLookupTable())
         self.vb.plot_view.add_widget(self.wheel)
         self.vb.plot_view.add_widget(self.polar_hist)
-        self.vb.plot_view.fit_view()
 
         if image is not None:
             self.setImage(image)
@@ -79,6 +77,8 @@ class ColMapDirectionItem(QtWidgets.QWidget):
 
             self.set_angle_histogram()
 
+        self.vb.plot_view.fit_view_to(np.array([1.2, -1.2, -1.2, 1.2]))
+
         self.lut = None
 
     def set_angle_histogram(self):
@@ -95,8 +95,6 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         hist = np.histogram(hist_sample, bins=180, range=(0, 2 * np.pi))
 
         self.polar_hist.set_data(normalise_copy(hist[1]), normalise_copy(hist[0]))
-        self.vb.plot_view.fit_view()
-        self.vb.update()
 
     def gradientChanged(self):
         # if self.image is not None:

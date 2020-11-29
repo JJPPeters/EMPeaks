@@ -7,8 +7,13 @@ from GUI.Utilities.enums import ImageType, WindowType, AnnotationType, ComplexDi
 
 
 class PolarImagePlot(OglPolarImageTechnique):
-    def __init__(self, angle=None, magnitude=None, alpha=None, z_value=1, visible=True):
-        super(PolarImagePlot, self).__init__(z_value=z_value, visible=visible)
+    def __init__(self, angle=None, magnitude=None, alpha=None,
+                 pixel_scale: float = 1.0,
+                 origin=np.array([0.0, 0.0], dtype=np.float32),
+                 z_value=1, visible=True):
+        super(PolarImagePlot, self).__init__(pixel_scale=pixel_scale,
+                                             origin=origin,
+                                             z_value=z_value, visible=visible)
 
         self.plot_type = AnnotationType.Polar
 

@@ -85,10 +85,14 @@ class PlotView(QtCore.QObject):
     def visible(self):
         return True
 
-    def fit_view(self, extend=1.0):  # , preserve_aspect=True):
+    def fit_view_to(self, lims, extend=1.0):
+        self._fit_view(lims, extend=extend)
 
+    def fit_view(self, extend=1.0):
         lims = self.scene_limits()
+        self._fit_view(lims, extend=extend)
 
+    def _fit_view(self, lims, extend=1.0):  # , preserve_aspect=True):
         w = lims[3] - lims[1]
         h = lims[0] - lims[2]
 
