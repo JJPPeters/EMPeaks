@@ -142,6 +142,15 @@ class OglPolarImageTechnique:
         for tile in self.techniques:
             tile.angle_offset = angle
 
+    def set_bcg(self, b, c, g):
+        bb = 1.5 - (b * 2)
+        cc = 5 ** (4 * (c - 0.5))
+        gg = 10 ** (4 * (-g + 0.5))
+
+        bcg = np.array([bb, cc, gg])
+        for tile in self.techniques:
+            tile.bcg = bcg
+
     @property
     def visible(self):
         return self._visible

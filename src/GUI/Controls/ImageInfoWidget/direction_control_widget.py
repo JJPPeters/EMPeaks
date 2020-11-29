@@ -22,13 +22,31 @@ class DirectionControlWidget(QtWidgets.QWidget):
         # variable for the angle, this gets reset basically on creating the slider
         self.Angle = 0
 
+        # these are our default values, they will be changed very quickly by the slider signals when they
+        # are created
+        self.B = 0.5
+        self.C = 0.5
+        self.G = 0.5
+
+        # create slider widgets
+        self.slider_brightness = SlideControlWidget(self, name="Brightness", min=0, max=100, default=50, scale=0.01)
+        self.slider_contrast = SlideControlWidget(self, name="Contrast", min=0, max=100, default=50, scale=0.01)
+        self.slider_gamma = SlideControlWidget(self, name="Gamma", min=0, max=100, default=50, scale=0.01)
+
         # create slider widgets
         self.slider_angle = SlideControlWidget(self, name="Angle", min=0, max=360, default=0, scale=1.)
 
         # add everything to the layout
         self.verticalLayout.addWidget(self.wheel)
         self.verticalLayout.addWidget(self.slider_angle)
+        self.verticalLayout.addWidget(self.slider_brightness)
+        self.verticalLayout.addWidget(self.slider_contrast)
+        self.verticalLayout.addWidget(self.slider_gamma)
 
+        # connect the sliders to the slots that update stuff :)
+        self.slider_brightness.valueChanged.connect(self.brightnessChanged)
+        self.slider_contrast.valueChanged.connect(self.contrastChanged)
+        self.slider_gamma.valueChanged.connect(self.gammaChanged)
         self.slider_angle.valueChanged.connect(self.angleChanged)
 
     def setImage(self, image):
@@ -47,6 +65,24 @@ class DirectionControlWidget(QtWidgets.QWidget):
         self.slider_angle.blockSignals(False)
 
         self.wheel.updateAngle(self.Angle)
+
+    # Slot
+    def brightnessChanged(self, value, update=True):
+        self.B = value
+        if update:
+            self.wheel.updateBCG(self.B, self.C, self.G)
+
+    # Slot
+    def contrastChanged(self, value, update=True):
+        self.C = value
+        if update:
+            self.wheel.updateBCG(self.B, self.C, self.G)
+
+    # Slot
+    def gammaChanged(self, value, update=True):
+        self.G = value
+        if update:
+            self.wheel.updateBCG(self.B, self.C, self.G)
 
     # Slot
     def angleChanged(self, value, update=True):

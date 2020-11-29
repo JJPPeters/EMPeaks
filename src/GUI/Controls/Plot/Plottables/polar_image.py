@@ -32,6 +32,9 @@ class PolarImagePlot(OglPolarImageTechnique):
         # for intensity display
         self.limitsHistory = [(0., 1.)]
 
+        # this is used to set the brightness, contrast and gamma of the image
+        self.BCG = np.array([0.5, 0.5, 0.5])
+
         # self.current_slice = 0
 
         self.initialise()
@@ -67,6 +70,12 @@ class PolarImagePlot(OglPolarImageTechnique):
     def set_cmap_angle_offset(self, angle):
         self.cmap_angle_offset = angle
         super(PolarImagePlot, self).set_cmap_angle_offset(angle)
+        if self.parent is not None:
+            self.parent.update()
+
+    def set_bcg(self, b, c, g):
+        self.BCG = np.array([b, c, g])
+        super(PolarImagePlot, self).set_bcg(b, c, g)
         if self.parent is not None:
             self.parent.update()
 

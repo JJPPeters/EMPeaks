@@ -29,7 +29,11 @@ uniform sampler2D tex_unit_alpha;
 
 uniform float magnitude_min;
 uniform float magnitude_max;
+
 uniform float angle_offset;
+uniform float brightness;
+uniform float contrast;
+uniform float gamma;
 
 uniform vec4 colour_map[256];
 
@@ -40,6 +44,8 @@ void main()
 {
     float mag = texture(tex_unit_magnitude, theCoords).r;
     mag = clamp((mag - magnitude_min) / magnitude_max, 0.0, 1.0);
+    mag = contrast * (pow(mag, gamma) - brightness) + 0.5;
+    mag = clamp(mag, 0.0, 1.0);
 
     float ang = texture(tex_unit_angle, theCoords).r + angle_offset;
     

@@ -33,6 +33,10 @@ class OglPolarImageTileTechnique(OglTechnique):
 
         self.min_location = None
         self.max_location = None
+
+        self.b_location = None
+        self.c_location = None
+        self.g_location = None
         self.angle_offset_location = None
 
         self.colourmap_location = None
@@ -67,6 +71,8 @@ class OglPolarImageTileTechnique(OglTechnique):
         self.colour_map[:, 2] = np.linspace(0, 1, 256)
         self.colour_map[:, 3] = 1
 
+        self.bcg = np.array([0.5, 1.0, 1.0])
+
     @property
     def limits(self: QOpenGLWidget):
         limits = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
@@ -99,7 +105,11 @@ class OglPolarImageTileTechnique(OglTechnique):
 
         self.min_location = self.get_uniform_location("magnitude_min")
         self.max_location = self.get_uniform_location("magnitude_max")
+
         self.angle_offset_location = self.get_uniform_location("angle_offset")
+        self.b_location = self.get_uniform_location("brightness")
+        self.c_location = self.get_uniform_location("contrast")
+        self.g_location = self.get_uniform_location("gamma")
 
         self.colourmap_location = self.get_uniform_location("colour_map")
 
@@ -196,7 +206,16 @@ class OglPolarImageTileTechnique(OglTechnique):
 
         gl.glUniform1f(self.min_location, self.min)
         gl.glUniform1f(self.max_location, self.max)
+
         gl.glUniform1f(self.angle_offset_location, self.angle_offset)
+
+        b = self.bcg[0]
+        c = self.bcg[1]
+        g = self.bcg[2]
+
+        gl.glUniform1f(self.b_location, b)
+        gl.glUniform1f(self.c_location, c)
+        gl.glUniform1f(self.g_location, g)
 
         gl.glUniform1i(self.texture_angle_location, self.angle_buffer.unit)
         gl.glUniform1i(self.texture_magnitude_location, self.magnitude_buffer.unit)

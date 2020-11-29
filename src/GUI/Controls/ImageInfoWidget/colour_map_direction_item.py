@@ -37,16 +37,18 @@ class ColMapDirectionItem(QtWidgets.QWidget):
 
         r = 128
         res = r * 2
+        self.circ_r = 1.0
+        self.max_r = 1.3
 
-        self.polar_hist = PolarHistogramPlot(np.array([0.0, 1.0]), np.array([0]), min_r=1.0, max_r=1.2, fill_colour=np.array([147, 41, 132, 200]),
-                                  border_width=2, border_colour=np.array([189, 48, 171, 255]), z_value=1, visible=True)
+        self.polar_hist = PolarHistogramPlot(np.array([0.0, 1.0]), np.array([0]), min_r=1.0, max_r=self.max_r, fill_colour=np.array([147, 41, 132, 255]),
+                                  border_width=0, border_colour=np.array([0, 0, 0, 0]), z_value=1, visible=True)
 
-        self.mag_hist = HistogramPlot(np.array([0.0, 1.0]), np.array([0]), fill_colour=np.array([255, 255, 255, 120]),
+        self.mag_hist = HistogramPlot(np.array([0.0, 1.0]), np.array([0]), fill_colour=np.array([255, 255, 255, 200]),
                                   border_width=2, border_colour=np.array([255, 255, 255, 255]), z_value=1, visible=True)
 
         self.hist_x_line = LinePlot(np.array([0.0, 1.0]), np.array([0.0, 0.0]),
                                     thickness=2, colour=np.array([255, 255, 255, 255]), z_value=2)
-        # self.hist_y_line = LinePlot(np.array([0.0, 0.0]), np.array([0.0, 1.0]),
+        # self.hist_y_line = LinePlot(np.array([0.0, 0.0]), np.array([0.0, 0.33]),
         #                             thickness=2, colour=np.array([200, 200, 200, 255]), z_value=2)
 
         # Create the wheel image
@@ -96,7 +98,7 @@ class ColMapDirectionItem(QtWidgets.QWidget):
             self.set_angle_histogram()
             self.applyHistogramHistory()
 
-        self.vb.plot_view.fit_view_to(np.array([1.2, -1.2, -1.2, 1.2]))
+        self.vb.plot_view.fit_view_to(np.array([self.max_r, -self.max_r, -self.max_r, self.max_r]))
 
         self.lut = None
 
@@ -194,3 +196,11 @@ class ColMapDirectionItem(QtWidgets.QWidget):
 
         # self.wheel.set_levels(r.astype(np.float32))
         self.image.image_plot.set_levels(r.astype(np.float32))
+
+    def updateBCG(self, B, C, G):
+        self.vb.makeCurrent()
+        if self.image is not None and self.image.image_plot is not None:
+            self.image.image_plot.set_bcg(B, C, G)
+            self.wheel.set_bcg(B, C, G)
+
+        self.vb.update()
