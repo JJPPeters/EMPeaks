@@ -63,7 +63,7 @@ class ColMapHistogramItem(QtWidgets.QWidget):
             self.setImage(image)
 
         self.gradient.sigDoubleClick.connect(self.vb.rewindHistory)
-        self.gradient.sigGradientChanged.connect(self.gradientChanged)
+        # self.gradient.sigGradientChanged.connect(self.gradientChanged)
         self.vb.sigLimitsChanged.connect(self.regionChanged)
 
     def setImage(self, img):
@@ -145,14 +145,14 @@ class ColMapHistogramItem(QtWidgets.QWidget):
 
         self.vb.update()
 
-    def gradientChanged(self):
+    # def gradientChanged(self):
         # if self.image is not None and self.image.image_plot is not None:
             # send function pointer, not the result
             # self.image.image_plot.set_colour_map(self.getLookupTable(original=True))
 
         # self.lut = None
         # # self.sigLookupTableChanged.emit(self)
-        return
+        # return
 
     def getLookupTable(self, img=None, n=None, alpha=True, original=False):
         if n is None:

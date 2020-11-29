@@ -90,3 +90,10 @@ class StaticViewBox(PlotWidget):
         self.sigLimitsChanged.emit()
 
         self.update()
+
+    def stepBackHistory(self):
+        if len(self.axHistory) < 2:
+            return
+
+        self.axHistory = self.axHistory[:-1]
+        self.sigLimitsChanged.emit()

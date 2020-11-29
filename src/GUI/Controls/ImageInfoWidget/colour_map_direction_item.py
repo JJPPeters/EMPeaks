@@ -32,6 +32,9 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         self.layout.addWidget(self.vb, 0, 0)
         self.layout.addWidget(self.gradient, 1, 0)
 
+        # bins for the histogram
+        self.bins = 128
+
         r = 128
         res = r * 2
 
@@ -76,7 +79,8 @@ class ColMapDirectionItem(QtWidgets.QWidget):
         if image is not None:
             self.setImage(image)
 
-        self.gradient.sigGradientChanged.connect(self.gradientChanged)
+        # self.gradient.sigGradientChanged.connect(self.gradientChanged)
+        self.vb.sigLimitsChanged.connect(self.regionChanged)
 
     def setImage(self, img):
         self.image = img
@@ -87,14 +91,16 @@ class ColMapDirectionItem(QtWidgets.QWidget):
             if img.image_plot.colour_map is not None:
                 self.changeColmap(img.image_plot.colour_map)
 
+            self.vb.axHistory = self.image.image_plot.limitsHistory
+
             self.set_angle_histogram()
+            self.applyHistogramHistory()
 
         self.vb.plot_view.fit_view_to(np.array([1.2, -1.2, -1.2, 1.2]))
 
         self.lut = None
 
     def set_angle_histogram(self):
-
         intens = self.image.image_plot.angle_data
 
         target_sample_size = 5e5
@@ -106,10 +112,7 @@ class ColMapDirectionItem(QtWidgets.QWidget):
 
         ang_hist = np.histogram(hist_sample, bins=180, range=(0, 2 * np.pi))
 
-        mag_hist = np.histogram(hist_sample, bins=180, range=(0, 2 * np.pi))
-
         self.polar_hist.set_data(normalise_copy(ang_hist[1]), normalise_copy(ang_hist[0]))
-        self.mag_hist.set_data(normalise_copy(mag_hist[1]), normalise_copy(mag_hist[0]) / 3)
 
     def gradientChanged(self):
         # if self.image is not None:
@@ -143,3 +146,51 @@ class ColMapDirectionItem(QtWidgets.QWidget):
 
         self.gradient.updateAngle(Angle)
         self.wheel.set_cmap_angle_offset(Angle)
+
+    def regionChanged(self):
+        if self.image is not None and self.image.image_plot is not None:
+            self.applyHistogramHistory()
+
+    def applyHistogramHistory(self):
+        self.vb.makeCurrent()
+        self.image.limitsHistory = self.vb.axHistory  # update the limits history
+
+        intens = self.image.image_plot.magnitude_data
+
+        target_sample_size = 5e5
+        if intens.size < target_sample_size:
+            hist_sample = intens
+        else:
+            sample_factor = int(np.sqrt(intens.size / target_sample_size))
+            hist_sample = get_grid_sample_spacing(intens, sample_factor)
+
+        r = np.array([np.min(hist_sample), np.max(hist_sample)])
+        for h in self.image.limitsHistory:
+            h_range = np.array(h)
+
+            r_r = r[1] - r[0]
+            r[0] = r[0] + r_r * h_range[0]
+            r[1] = r[1] - r_r * (1 - h_range[1])
+
+        # TODO: maybe could include more data points to make sure histogram is more representative when zoomed in?
+
+        trim_pcnt = 0.01
+        sample_trimmed = hist_sample[np.logical_and(hist_sample >= r[0], hist_sample <= r[1])]
+        p_low, p_high = np.percentile(sample_trimmed, (trim_pcnt, 100-trim_pcnt))
+
+        r[0] = p_low
+        r[1] = p_high
+
+        self.currentXrange = np.zeros((3,), dtype=np.float32)
+        self.currentXrange[0:2] = r
+        self.currentXrange[2] = r[1] - r[0]
+
+        hist = np.histogram(hist_sample, bins=self.bins, range=r)
+
+        # I normalize this data so it is easier to verlay the plots!
+        self.mag_hist.set_data(normalise_copy(hist[1]), normalise_copy(hist[0]) / 3)
+        # self.vb.plot_view.fit_view()
+        self.vb.update()
+
+        # self.wheel.set_levels(r.astype(np.float32))
+        self.image.image_plot.set_levels(r.astype(np.float32))

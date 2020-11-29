@@ -29,6 +29,9 @@ class PolarImagePlot(OglPolarImageTechnique):
 
         self.cmap_angle_offset = 0.0
 
+        # for intensity display
+        self.limitsHistory = [(0., 1.)]
+
         # self.current_slice = 0
 
         self.initialise()
@@ -64,5 +67,10 @@ class PolarImagePlot(OglPolarImageTechnique):
     def set_cmap_angle_offset(self, angle):
         self.cmap_angle_offset = angle
         super(PolarImagePlot, self).set_cmap_angle_offset(angle)
+        if self.parent is not None:
+            self.parent.update()
+
+    def set_levels(self, levels):
+        super(PolarImagePlot, self).set_levels(levels)
         if self.parent is not None:
             self.parent.update()
