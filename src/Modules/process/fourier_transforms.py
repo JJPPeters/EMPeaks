@@ -14,7 +14,7 @@ class FftModule(MenuEntryModule):
             return
         fftmat = np.fft.fftshift(np.fft.fft2(self.main_window.last_active.image_plot.image_data, axes=(0, 1)), axes=(0, 1))
 
-        self.main_window.create_new_image("FFT of " + self.main_window.last_active.name, fftmat)
+        self.create_new_display("FFT of " + self.main_window.last_active.name, fftmat)
 
 
 class IfftMmodule(MenuEntryModule):
@@ -29,4 +29,4 @@ class IfftMmodule(MenuEntryModule):
             return
         ifftmat = np.fft.ifft2(np.fft.fftshift(self.main_window.last_active.image_plot.image_data, axes=(0, 1)), axes=(0, 1))
 
-        self.main_window.create_new_image("FFT of " + self.main_window.last_active.name, ifftmat)
+        self.create_new_display("FFT of " + self.main_window.last_active.name, ifftmat)

@@ -1,7 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from GUI.Controls.Plot import PlotWidget
-from GUI.Controls import ImageDisplayWidget
+from GUI.Controls.ImageDisplay import ImageDisplayWidget
+
 
 class ImageWindowUi(object):
     def setupUi(self, image_window, filename):

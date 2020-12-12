@@ -1,5 +1,6 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 
+from GUI.Controls.ImageDisplay import ImageDisplayWidget
 from GUI import MainWindow
 from GUI.Controls.Plot.Plottables import ScatterPlot, ImagePlot
 
@@ -37,7 +38,7 @@ class Module:
         return self._main_window
 
     @property
-    def active_image_window(self):
+    def active_image_display(self):
         if self.main_window is not None:
             return self.main_window.last_active
 
@@ -57,23 +58,23 @@ class Module:
         return image
 
     def add_widget_to_image_window(self, widget, row, col):
-        sz = self.active_image_window.normal_window_size
-        w_sz = widget.size()
-        w_sz.setHeight(0)
-        sz += w_sz
-        self.active_image_window.setNormalSize(sz)
+        # sz = self.active_image_display.normal_window_size
+        # w_sz = widget.size()
+        # w_sz.setHeight(0)
+        # sz += w_sz
+        # self.active_image_display.setNormalSize(sz)
 
-        self.active_image_window.ui.gridLayout.addWidget(widget, row, col)
+        self.active_image_display.layout.addWidget(widget, row, col)
         widget.signal_result.connect(self.remove_widget_from_image_window)
 
     def remove_widget_from_image_window(self, widget, state):
-        self.active_image_window.ui.gridLayout.removeWidget(widget)
+        self.active_image_display.layout.removeWidget(widget)
         widget.close()
-        sz = self.active_image_window.normal_window_size
-        w_sz = widget.size()
-        w_sz.setHeight(0)
-        sz -= w_sz
-        self.active_image_window.setNormalSize(sz)
+        # sz = self.active_image_display.normal_window_size
+        # w_sz = widget.size()
+        # w_sz.setHeight(0)
+        # sz -= w_sz
+        # self.active_image_display.setNormalSize(sz)
 
     def set_colour_map(self, col_map_key):
         col_map = self.main_window.colour_maps[col_map_key]
@@ -84,32 +85,49 @@ class Module:
     def set_console_message(self, message, message_type=Console.Message, show_id=True, bold=False,
                             end_new_line=True):
 
-        self.main_window.set_console_message(message, message_type, self.active_image_window, show_id, bold, end_new_line)
+        self.main_window.set_console_message(message, message_type, self.active_image_display, show_id, bold, end_new_line)
 
     def create_or_update_image(self, tag, image, keep_view=True):
-        if tag not in self.active_image_window.plottables:
+        if tag not in self.active_image_display.plottables:
             image_plot = ImagePlot(image)
-            self.active_image_window.add_plottable(tag, image_plot, keep_view=keep_view)
+            self.active_image_display.add_plottable(tag, image_plot, keep_view=keep_view)
         else:
-            self.active_image_window.image_plot.set_data(image, keep_view=keep_view)
+            self.active_image_display.image_plot.set_data(image, keep_view=keep_view)
 
-        self.active_image_window.sigImageChanged.emit(self.active_image_window)
-        self.active_image_window.plot_item.update()
+        self.active_image_display.sigImageChanged.emit(self.active_image_display)
+        self.active_image_display.plot_item.update()
 
     def create_or_update_scatter(self, tag, points):
         if points is None:
-            self.active_image_window.delete_plottable(tag)
+            self.active_image_display.delete_plottable(tag)
             return
 
-        if tag not in self.active_image_window.plottables and points.size > 2:
+        if tag not in self.active_image_display.plottables and points.size > 2:
             scatter = ScatterPlot(points=points,
                                   size=10,
                                   fill_colour=np.array(next(self.main_window.scatter_cols)) / 255)
-            self.active_image_window.add_plottable(tag, scatter)
+            self.active_image_display.add_plottable(tag, scatter)
         else:
             if points.size > 2:
-                self.active_image_window.plottables[tag].set_points(points)
+                self.active_image_display.plottables[tag].set_points(points)
             else:
-                self.active_image_window.delete_plottable(tag)
+                self.active_image_display.delete_plottable(tag)
 
-        self.active_image_window.ui.imageItem.update()
+        self.active_image_display.ui.imageItem.update()
+
+    def create_new_display(self, title, data) -> ImageDisplayWidget:
+
+        image_id = self.main_window.generate_window_id()
+
+        image_display = ImageDisplayWidget(title, image_id, self.main_window)
+        self.main_window.children[image_id] = image_display
+        self.main_window.ui.tabWidget.addTab(image_display, f"{image_id}:{title}")
+
+        ti = self.main_window.ui.tabWidget.indexOf(image_display)
+        self.main_window.ui.tabWidget.setCurrentIndex(ti)
+
+        # now create the plot
+        image_plot = ImagePlot(data)
+        image_display.set_image_plot(image_plot)
+
+        return image_display

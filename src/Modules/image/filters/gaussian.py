@@ -1,5 +1,5 @@
 from GUI.Modules.menu_entry_module import MenuEntryModule
-from GUI import ImageWindow
+from GUI.Controls.ImageDisplay import ImageDisplayWidget
 from GUI.Controls.ProcessSettingsFrame import ProcessSettingsFrame
 
 import numpy as np
@@ -14,11 +14,11 @@ class GaussFilterModule(MenuEntryModule):
         self.order_priority = 0
 
     def run(self):
-        if self.main_window.last_active is None or not isinstance(self.main_window.last_active, ImageWindow):
+        if not self.main_window.image_requirements_met():
             return
 
         # todo: is there any sensible way to get this to work for complex (or do I care?)
-        if np.iscomplexobj(self.active_image_window.image_plot.image_data):
+        if np.iscomplexobj(self.active_image_display.image_plot.image_data):
             return
 
         # create parameters for dialog

@@ -147,7 +147,7 @@ class DisplacementField(MenuEntryModule):
         average_spin = ["SpinInt", 6, "Average neighbours", (0, 100, 1, 0)]
         norm_check = ["Check", 7, "Normalise", False]
 
-        filterdialog = ProcessSettingsDialog(master=self.active_image_window,
+        filterdialog = ProcessSettingsDialog(master=self.active_image_display,
                                              function=self.do_displacement_map,
                                              name="Map",
                                              inputs=[ref_combo,

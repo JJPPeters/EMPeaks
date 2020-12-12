@@ -32,7 +32,7 @@ class BraggFilterModule(MenuEntryModule):
 
     def run(self):
         # get the current image
-        im = self.active_image_window.image_plot.image_data
+        im = self.active_image_display.image_plot.image_data
         # get the FFT
         self.fft_im = np.fft.fftshift(np.fft.fft2(im, axes=(0, 1)), axes=(0, 1))
 
@@ -94,7 +94,7 @@ class BraggFilterModule(MenuEntryModule):
         self.new_image_widget = PlotWidget()
 
         # # show it next to the current image
-        self.active_image_window.ui.gridLayout.addWidget(self.new_image_widget, 0, 2)
+        self.active_image_display.ui.gridLayout.addWidget(self.new_image_widget, 0, 2)
 
         self.fft_plot = ImagePlot(self.fft_im)
         self.new_image_widget.plot_view.add_widget(self.fft_plot, fit=True)
@@ -175,7 +175,7 @@ class BraggFilterModule(MenuEntryModule):
         self.fft_plot = None
 
         # print('getting rid of')
-        self.active_image_window.ui.gridLayout.removeWidget(self.new_image_widget)
+        self.active_image_display.ui.gridLayout.removeWidget(self.new_image_widget)
         # todo: does this do what I want?? does it ever actually get deleted?
         self.new_image_widget.close()
 

@@ -82,7 +82,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.lastActiveChanged.emit(self.last_active)
 
     def image_requirements_met(self):
-        return self.last_active is not None and isinstance(self.last_active, GUI.Controls.ImageDisplayWidget)
+        return self.last_active is not None and isinstance(self.last_active, GUI.Controls.ImageDisplay.ImageDisplayWidget)
 
     def confirm_replace_peaks(self, tag):
         if tag in self.last_active.plottables:
@@ -148,21 +148,6 @@ class MainWindow(QtWidgets.QMainWindow):
         msg = ''.join(traceback.format_exception(t, val, tb))
         self.set_console_message(msg, message_type=Console.Error, bold=True)
         self.default_except_hook(t, val, tb)  # this lets the console show the message too
-
-    def create_new_image(self, title, data) -> GUI.ImageWindow:
-        # create our new plot window
-        window_id = self.generate_window_id()
-        new_image_window = GUI.ImageWindow(title, window_id, master=self)
-        new_image_window.show()
-
-        # now create the plot
-        image_plot = ImagePlot(data)
-        new_image_window.set_image_plot(image_plot)
-
-        # update our records
-        self.children[window_id] = new_image_window
-
-        return self.children[window_id]
 
     def remove_image(self, id):
         if id in self.children:

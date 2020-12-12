@@ -32,7 +32,7 @@ class RefineGaussianFit(MenuEntryModule):
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
-            master=self.active_image_window,
+            master=self.active_image_display,
             name="Gaussian fit",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
             inputs=[refine_radius, shift_limit, frac_change, fit_method, use_rot],
@@ -40,10 +40,10 @@ class RefineGaussianFit(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_gaussian_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.intensities
+        image = self.active_image_display.image_plot.intensities
         v = params
 
-        fit_out = do_fitting_gauss(image, self.active_image_window.plottables[tag].points,
+        fit_out = do_fitting_gauss(image, self.active_image_display.plottables[tag].points,
                                    fit_r=v["Fit radius"],
                                    lim=v["Shift limit"],
                                    frac_change=v['Parameter change percent'],
@@ -52,8 +52,8 @@ class RefineGaussianFit(MenuEntryModule):
 
         self.create_or_update_scatter(tag, fit_out[0])
 
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit', fit_out[2])
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit difference', fit_out[1])
+        self.create_new_display(self.main_window.last_active.name + ' fit', fit_out[2])
+        self.create_new_display(self.main_window.last_active.name + ' fit difference', fit_out[1])
 
 
 class RefineLorentzFit(MenuEntryModule):
@@ -79,7 +79,7 @@ class RefineLorentzFit(MenuEntryModule):
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
-            master=self.active_image_window,
+            master=self.active_image_display,
             name="Lorentz",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
             inputs=[refine_radius, shift_limit, frac_change, fit_method, use_rot],
@@ -87,10 +87,10 @@ class RefineLorentzFit(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_gaussian_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.intensities
+        image = self.active_image_display.image_plot.intensities
         v = params
 
-        fit_out = do_fitting_lorentz(image, self.active_image_window.plottables[tag].points,
+        fit_out = do_fitting_lorentz(image, self.active_image_display.plottables[tag].points,
                                      fit_r=v["Fit radius"],
                                      lim=v["Shift limit"],
                                      frac_change=v['Parameter change percent'],
@@ -99,8 +99,8 @@ class RefineLorentzFit(MenuEntryModule):
 
         self.create_or_update_scatter(tag, fit_out[0])
 
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit', fit_out[2])
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit difference', fit_out[1])
+        self.create_new_display(self.main_window.last_active.name + ' fit', fit_out[2])
+        self.create_new_display(self.main_window.last_active.name + ' fit difference', fit_out[1])
 
 
 class RefinePearsonFit(MenuEntryModule):
@@ -126,7 +126,7 @@ class RefinePearsonFit(MenuEntryModule):
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
-            master=self.active_image_window,
+            master=self.active_image_display,
             name="Pearson",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
             inputs=[refine_radius, shift_limit, frac_change, fit_method, use_rot],
@@ -134,10 +134,10 @@ class RefinePearsonFit(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_gaussian_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.intensities
+        image = self.active_image_display.image_plot.intensities
         v = params
 
-        fit_out = do_fitting_pearson(image, self.active_image_window.plottables[tag].points,
+        fit_out = do_fitting_pearson(image, self.active_image_display.plottables[tag].points,
                                      fit_r=v["Fit radius"],
                                      lim=v["Shift limit"],
                                      frac_change=v['Parameter change percent'],
@@ -146,8 +146,8 @@ class RefinePearsonFit(MenuEntryModule):
 
         self.create_or_update_scatter(tag, fit_out[0])
 
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit', fit_out[2])
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit difference', fit_out[1])
+        self.create_new_display(self.main_window.last_active.name + ' fit', fit_out[2])
+        self.create_new_display(self.main_window.last_active.name + ' fit difference', fit_out[1])
 
 
 class RefineVoigtFit(MenuEntryModule):
@@ -173,7 +173,7 @@ class RefineVoigtFit(MenuEntryModule):
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
-            master=self.active_image_window,
+            master=self.active_image_display,
             name="Voigt",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
             inputs=[refine_radius, shift_limit, frac_change, fit_method, use_rot],
@@ -181,10 +181,10 @@ class RefineVoigtFit(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_gaussian_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.intensities
+        image = self.active_image_display.image_plot.intensities
         v = params
 
-        fit_out = do_fitting_voigt(image, self.active_image_window.plottables[tag].points,
+        fit_out = do_fitting_voigt(image, self.active_image_display.plottables[tag].points,
                                    fit_r=v["Fit radius"],
                                    lim=v["Shift limit"],
                                    frac_change=v['Parameter change percent'],
@@ -193,5 +193,5 @@ class RefineVoigtFit(MenuEntryModule):
 
         self.create_or_update_scatter(tag, fit_out[0])
 
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit', fit_out[2])
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit difference', fit_out[1])
+        self.create_new_display(self.main_window.last_active.name + ' fit', fit_out[2])
+        self.create_new_display(self.main_window.last_active.name + ' fit difference', fit_out[1])

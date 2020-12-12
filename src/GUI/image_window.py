@@ -53,10 +53,10 @@ class ImageWindow(QtWidgets.QMainWindow):
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
-        self.ui.plot.plot_item.plot_view.signal_mouse_moved.connect(self.update_cursor)
-
-        self.ui.plot.plot_item.plot_view.signal_rect_selected.connect(self.select_from_rect)
-        self.ui.plot.plot_item.plot_view.signal_mouse_clicked.connect(self.select_from_click)
+        # self.ui.plot.plot_item.plot_view.signal_mouse_moved.connect(self.update_cursor)
+        #
+        # self.ui.plot.plot_item.plot_view.signal_rect_selected.connect(self.select_from_rect)
+        # self.ui.plot.plot_item.plot_view.signal_mouse_clicked.connect(self.select_from_click)
 
     def event(self, event):
         # activate this window here
@@ -111,77 +111,7 @@ class ImageWindow(QtWidgets.QMainWindow):
         self.ui.plot.makeCurrent()
         self.image_plot.set_slice(index)
 
-    def delete_plottable(self, tag, update=True):
-        if tag not in self.plottables:
-            return
 
-        tagType = self.plottables[tag].plot_type
-
-        i = None
-
-        if tagType == AnnotationType.Scatter:
-            i = self.ui.plot.plot_view.remove_widget(self.plottables[tag])
-            del self.plottables[tag]
-
-        if tagType == AnnotationType.Quiver:
-            i = self.ui.plot.plot_view.remove_widget(self.plottables[tag])
-            del self.plottables[tag]
-
-        if tagType == AnnotationType.Basis:
-            i = self.ui.plot.plot_view.remove_widget(self.plottables[tag])
-            del self.plottables[tag]
-
-        self.ui.plot.update()
-
-        if update:
-            self.sigPlottablesChanged.emit(self)
-
-        return i
-
-    def hide_plottable(self, tag, visible):
-        if tag not in self.plottables:
-            raise Exception("Tried using annotation: " + tag + " but it doesnt exist")
-
-        self.plottables[tag].visible = visible
-
-        self.ui.plot.update()
-
-    def click_add_point(self):
-        tag = 'Peaks'
-        # test if we have a scatter plot to add to (else create it)
-        # or if our tag is not a scatter plot!
-        if tag not in self.plottables.keys():
-            self.add_plottable(tag, ScatterPlot(fill_colour=np.array(next(self.master.scatter_cols)) / 255, size=10, z_value=2))
-        elif tag in self.plottables.keys() and not isinstance(self.plottables[tag], ScatterPlot):
-            raise Exception("Trying to add points to non scatter plot")
-
-        # connect the signal 'click' from the plot to the scatter
-        self.ui.plot.plot_view.signal_mouse_clicked.disconnect(self.select_from_click)
-        self.ui.plot.plot_view.signal_mouse_clicked.connect(self.add_point_from_click)
-
-    def add_point_from_click(self, px, py, modifier, tag='Peaks'):
-
-        self.plottables[tag].add_point(px, py)
-
-        if modifier != QtCore.Qt.ShiftModifier:
-            self.ui.plot.plot_view.signal_mouse_clicked.disconnect(self.add_point_from_click)
-            self.ui.plot.plot_view.signal_mouse_clicked.connect(self.select_from_click)
-
-    def select_from_click(self, px, py, modifier, tag='Peaks'):
-        if tag in self.plottables.keys():
-            self.plottables[tag].select_from_click(px, py)
-
-    def select_from_rect(self, top, left, bottom, right, tag='Peaks'):
-        if tag in self.plottables.keys():
-            self.plottables[tag].select_in_rectangle(top, left, bottom, right)
-
-    def delete_selected(self, tag='Peaks'):
-        if tag in self.plottables.keys():
-            self.plottables[tag].delete_selected()
-
-            if self.plottables[tag].points.size == 0:
-                self.delete_plottable(tag)
-                self.ui.plot.update()
 
     def update_cursor(self, px, py):
         if self.image_plot is None:

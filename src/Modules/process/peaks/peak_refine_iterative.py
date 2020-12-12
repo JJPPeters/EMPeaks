@@ -35,7 +35,7 @@ class IterativeRefineGaussian(MenuEntryModule):
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
-            master=self.active_image_window,
+            master=self.active_image_display,
             name="Gaussian",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
             inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit, use_rot],
@@ -43,10 +43,10 @@ class IterativeRefineGaussian(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_gaussian_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.intensities.copy()
+        image = self.active_image_display.image_plot.intensities.copy()
         v = params
 
-        fit_out = do_fitting_it_gauss(image, self.active_image_window.plottables[tag].points,
+        fit_out = do_fitting_it_gauss(image, self.active_image_display.plottables[tag].points,
                                       fit_r=v[0],
                                       contribute_r=v[1],
                                       iterations=v[2],
@@ -58,8 +58,8 @@ class IterativeRefineGaussian(MenuEntryModule):
 
         self.create_or_update_scatter(tag, fit_out[0])
 
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit', fit_out[2])
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit difference', fit_out[1])
+        self.create_new_display(self.main_window.last_active.name + ' fit', fit_out[2])
+        self.create_new_display(self.main_window.last_active.name + ' fit difference', fit_out[1])
 
 
 class IterativeRefineLorentzian(MenuEntryModule):
@@ -88,7 +88,7 @@ class IterativeRefineLorentzian(MenuEntryModule):
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
-            master=self.active_image_window,
+            master=self.active_image_display,
             name="Lorentzian",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
             inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit, use_rot],
@@ -96,10 +96,10 @@ class IterativeRefineLorentzian(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_gaussian_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.intensities.copy()
+        image = self.active_image_display.image_plot.intensities.copy()
         v = params
 
-        fit_out = do_fitting_it_lorentz(image, self.active_image_window.plottables[tag].points,
+        fit_out = do_fitting_it_lorentz(image, self.active_image_display.plottables[tag].points,
                                         fit_r=v[0],
                                         contribute_r=v[1],
                                         iterations=v[2],
@@ -111,8 +111,8 @@ class IterativeRefineLorentzian(MenuEntryModule):
 
         self.create_or_update_scatter(tag, fit_out[0])
 
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit', fit_out[2])
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit difference', fit_out[1])
+        self.create_new_display(self.main_window.last_active.name + ' fit', fit_out[2])
+        self.create_new_display(self.main_window.last_active.name + ' fit difference', fit_out[1])
 
 
 class IterativeRefinePearson(MenuEntryModule):
@@ -141,7 +141,7 @@ class IterativeRefinePearson(MenuEntryModule):
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
-            master=self.active_image_window,
+            master=self.active_image_display,
             name="Pearson VII",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
             inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit, use_rot],
@@ -149,10 +149,10 @@ class IterativeRefinePearson(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_gaussian_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.intensities.copy()
+        image = self.active_image_display.image_plot.intensities.copy()
         v = params
 
-        fit_out = do_fitting_it_pearson(image, self.active_image_window.plottables[tag].points,
+        fit_out = do_fitting_it_pearson(image, self.active_image_display.plottables[tag].points,
                                         fit_r=v[0],
                                         contribute_r=v[1],
                                         iterations=v[2],
@@ -164,8 +164,8 @@ class IterativeRefinePearson(MenuEntryModule):
 
         self.create_or_update_scatter(tag, fit_out[0])
 
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit', fit_out[2])
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit difference', fit_out[1])
+        self.create_new_display(self.main_window.last_active.name + ' fit', fit_out[2])
+        self.create_new_display(self.main_window.last_active.name + ' fit difference', fit_out[1])
 
 
 class IterativeRefineVoigt(MenuEntryModule):
@@ -194,7 +194,7 @@ class IterativeRefineVoigt(MenuEntryModule):
 
         # runs as modal dlg
         filter_settings = ProcessSettingsFrame(
-            master=self.active_image_window,
+            master=self.active_image_display,
             name="Pseudo Voigt",
             function=lambda p: self.do_refine_gaussian_iterative(p, tag),
             inputs=[refine_radius, contribution_radius, iterations, shift_limit, frac_change, fit_method, init_fit, use_rot],
@@ -202,10 +202,10 @@ class IterativeRefineVoigt(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_gaussian_iterative(self, params, tag):
-        image = self.active_image_window.image_plot.intensities.copy()
+        image = self.active_image_display.image_plot.intensities.copy()
         v = params
 
-        fit_out = do_fitting_it_voigt(image, self.active_image_window.plottables[tag].points,
+        fit_out = do_fitting_it_voigt(image, self.active_image_display.plottables[tag].points,
                                       fit_r=v[0],
                                       contribute_r=v[1],
                                       iterations=v[2],
@@ -217,5 +217,5 @@ class IterativeRefineVoigt(MenuEntryModule):
 
         self.create_or_update_scatter(tag, fit_out[0])
 
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit', fit_out[2])
-        self.main_window.create_new_image(self.main_window.last_active.name + ' fit difference', fit_out[1])
+        self.create_new_display(self.main_window.last_active.name + ' fit', fit_out[2])
+        self.create_new_display(self.main_window.last_active.name + ' fit difference', fit_out[1])

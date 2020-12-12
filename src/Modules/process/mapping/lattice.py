@@ -20,7 +20,7 @@
 #
 #         Adata = self.main_window.last_active.plottables[Acol].points
 #         Bdata = self.main_window.last_active.plottables[Bcol].points
-#         shp = self.active_image_window.image_plot.image_data.shape
+#         shp = self.active_image_display.image_plot.image_data.shape
 #         title = self.main_window.last_active.name
 #
 #         if Adata is not None and Bdata is not None:

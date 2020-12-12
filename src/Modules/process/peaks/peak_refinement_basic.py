@@ -35,8 +35,8 @@ class RefineCentroid(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_centroid(self, params, tag):
-        image = self.active_image_window.image_plot.intensities
-        peaks = self.active_image_window.plottables[tag].points
+        image = self.active_image_display.image_plot.intensities
+        peaks = self.active_image_display.plottables[tag].points
 
         start_time = time.time()
         new_points, stats = do_centroid(image, peaks, r=params["Radius"], lim=params["Shift limit"])
@@ -75,8 +75,8 @@ class RefineMaximum(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_maximum(self, params, tag):
-        image = self.active_image_window.image_plot.intensities
-        peaks = self.active_image_window.plottables[tag].points
+        image = self.active_image_display.image_plot.intensities
+        peaks = self.active_image_display.plottables[tag].points
 
         start_time = time.time()
         new_points, stats = do_maximum(image, peaks, r=params["Radius"], lim=params["Shift limit"])
@@ -116,8 +116,8 @@ class RefineInterpolate(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_interp(self, params, tag):
-        image = self.active_image_window.image_plot.intensities
-        peaks = self.active_image_window.plottables[tag].points
+        image = self.active_image_display.image_plot.intensities
+        peaks = self.active_image_display.plottables[tag].points
 
         start_time = time.time()
         new_points, stats = do_interp(image, peaks,
@@ -159,8 +159,8 @@ class RefineParabola(MenuEntryModule):
         self.add_widget_to_image_window(filter_settings, 0, 2)
 
     def do_refine_parabola(self, params, tag):
-        image = self.active_image_window.image_plot.intensities
-        peaks = self.active_image_window.plottables[tag].points
+        image = self.active_image_display.image_plot.intensities
+        peaks = self.active_image_display.plottables[tag].points
         v = params
 
         start_time = time.time()

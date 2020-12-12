@@ -26,7 +26,7 @@ from Processing.Image import rgb_array_to_greyscale
 
 import imageio
 
-from GUI.Controls import ImageDisplayWidget
+from GUI.Controls.ImageDisplay import ImageDisplayWidget
 
 
 class FileMenu(MenuEntry):
@@ -263,7 +263,7 @@ class FileMenu(MenuEntry):
 
         image_id = self.master.generate_window_id()
 
-        image_display = ImageDisplayWidget(title, image_id)
+        image_display = ImageDisplayWidget(title, image_id, self.master)
         self.master.children[image_id] = image_display
         self.master.ui.tabWidget.addTab(image_display, f"{image_id}:{title}")
 

@@ -33,7 +33,7 @@ class PeakTranslate(MenuEntryModule):
 
     def do_peak_shift(self, params):
         tag = 'Peaks'
-        peaks = self.active_image_window.plottables[tag].points.copy()
+        peaks = self.active_image_display.plottables[tag].points.copy()
 
         peaks[:, 0] += params[1]
         peaks[:, 1] += params[0]
@@ -69,7 +69,7 @@ class PeakRotate(MenuEntryModule):
 
     def do_peak_rotate(self, params):
         tag = 'Peaks'
-        peaks = self.active_image_window.plottables[tag].points.copy()
+        peaks = self.active_image_display.plottables[tag].points.copy()
 
         a = np.deg2rad(params[0])
         if params[1] == 'CW':
@@ -109,7 +109,7 @@ class PeakTranspose(MenuEntryModule):
 
     def do_peak_transpose(self, params):
         tag = 'Peaks'
-        peaks = self.active_image_window.plottables[tag].points.copy()
+        peaks = self.active_image_display.plottables[tag].points.copy()
 
         peaks = np.fliplr(peaks)
 
@@ -142,7 +142,7 @@ class PeakFlip(MenuEntryModule):
 
     def do_peak_flip(self, params):
         tag = 'Peaks'
-        peaks = self.active_image_window.plottables[tag].points.copy()
+        peaks = self.active_image_display.plottables[tag].points.copy()
         shp = self.main_window.last_active.intensities.shape
 
         if params[0] == 'Horizontal':

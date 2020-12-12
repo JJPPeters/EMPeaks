@@ -17,7 +17,7 @@ class BinModule(MenuEntryModule):
     def run(self):
         if not self.main_window.image_requirements_met():
             return
-        im = self.active_image_window.image_plot.image_data
+        im = self.active_image_display.image_plot.image_data
 
         controls = []
 
@@ -42,12 +42,12 @@ class BinModule(MenuEntryModule):
         filterdialog.sigApplyFilter.disconnect(self.do_binning)
 
     def do_binning(self, params):
-        image = self.active_image_window.image_plot.image_data
+        image = self.active_image_display.image_plot.image_data
 
         binned = bin_image(image, params)
 
         # self.create_or_update_image("Image", binned, keep_view=False)
-        self.main_window.create_new_image("Binned " + self.main_window.last_active.name, binned)
+        self.create_new_display("Binned " + self.main_window.last_active.name, binned)
 
 
 class UnBinModule(MenuEntryModule):
@@ -74,7 +74,7 @@ class UnBinModule(MenuEntryModule):
         filterdialog.sigApplyFilter.disconnect(self.do_unbinning)
 
     def do_unbinning(self, params):
-        image = self.active_image_window.image_plot.image_data
+        image = self.active_image_display.image_plot.image_data
         x_bin = params["x binning"]
         y_bin = params["y binning"]
 

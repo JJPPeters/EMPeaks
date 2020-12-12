@@ -41,6 +41,6 @@ class AffineModule(MenuEntryModule):
     def do_affine_transform(self, basis):
         # TODO: handle 3d images?
         # TODO: output image to new window
-        transformed_image = affine_transform(self.active_image_window.image_plot.image_data, basis.vector_coords)
-        self.main_window.create_new_image("Affined transformed " + self.main_window.last_active.name, transformed_image)
+        transformed_image = affine_transform(self.active_image_display.image_plot.image_data, basis.vector_coords)
+        self.create_new_display("Affined transformed " + self.main_window.last_active.name, transformed_image)
         # self.main_window.last_active.setImage(transformed_image)

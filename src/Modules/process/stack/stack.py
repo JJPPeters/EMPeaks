@@ -16,11 +16,11 @@ class StackSum(MenuEntryModule):
         if not self.main_window.image_requirements_met():
             return
 
-        im = self.active_image_window.image_plot.image_data
+        im = self.active_image_display.image_plot.image_data
 
         if im.ndim != 3:
             return
 
         sum_im = np.sum(im, axis=2)
 
-        self.main_window.create_new_image("Summed " + self.main_window.last_active.name, sum_im)
+        self.create_new_display("Summed " + self.main_window.last_active.name, sum_im)

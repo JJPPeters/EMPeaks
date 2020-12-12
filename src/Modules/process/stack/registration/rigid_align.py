@@ -14,10 +14,10 @@ class RigidAlign(MenuEntryModule):
         self.order_priority = 200
 
     def run(self):
-        if not self.main_window.image_requirements_met() or self.active_image_window.image_plot.image_data.ndim != 3:
+        if not self.main_window.image_requirements_met() or self.active_image_display.image_plot.image_data.ndim != 3:
             return
 
-        n = self.active_image_window.image_plot.image_data.shape[2]
+        n = self.active_image_display.image_plot.image_data.shape[2]
         sublattices = ["SpinInt", 0, "Reference slice", (0, n, 1, 0)]
         average_reference = ["Check", 1, "Average reference", False]
         crop = ["Check", 2, "Crop output", True]
@@ -39,14 +39,14 @@ class RigidAlign(MenuEntryModule):
         out_stack = params['Output stack']
         out_ave = params['Output average']
 
-        outputs = rigid_align(self.active_image_window.image_plot.image_data, ref, ref_ave, crop, out_stack, out_ave)
+        outputs = rigid_align(self.active_image_display.image_plot.image_data, ref, ref_ave, crop, out_stack, out_ave)
 
         # outputs will always have a 'cumulative_shifts' entry
 
         if 'averaged_stack' in outputs:  # we have an aligned stack
-            self.main_window.create_new_image("Averaged " + self.main_window.last_active.name, outputs['averaged_stack'])
+            self.create_new_display("Averaged " + self.main_window.last_active.name, outputs['averaged_stack'])
         if 'aligned_stack' in outputs:  # we have the averaged image
-            self.main_window.create_new_image("Aligned " + self.main_window.last_active.name, outputs['aligned_stack'])
+            self.create_new_display("Aligned " + self.main_window.last_active.name, outputs['aligned_stack'])
         # if 'cumulative_shifts' in outputs:  # we have the displacement data
         #     imageid = self.main_window.generate_image_id()
         #     newimagewindow = ControlGraphWindow("Shifts of " + self.main_window.last_active.name, imageid,
@@ -68,7 +68,7 @@ class OverdeterminedRigidAlign(MenuEntryModule):
         self.order_priority = 201
 
     def run(self):
-        if not self.main_window.image_requirements_met() or self.active_image_window.image_plot.image_data.ndim != 3:
+        if not self.main_window.image_requirements_met() or self.active_image_display.image_plot.image_data.ndim != 3:
             return
 
         crop = ["Check", 0, "Crop output", True]
@@ -88,14 +88,14 @@ class OverdeterminedRigidAlign(MenuEntryModule):
         out_stack = params['Output stack']
         out_average = params['Output average']
 
-        outputs = overdetermined_rigid_align(self.active_image_window.image_plot.image_data, crop, out_stack, out_average)
+        outputs = overdetermined_rigid_align(self.active_image_display.image_plot.image_data, crop, out_stack, out_average)
 
         # outputs will always have a 'cumulative_shifts' entry
         if 'averaged_stack' in outputs:  # we have an aligned stack
-            self.main_window.create_new_image("Averaged " + self.main_window.last_active.name,
+            self.create_new_display("Averaged " + self.main_window.last_active.name,
                                               outputs['averaged_stack'])
         if 'aligned_stack' in outputs:  # we have the averaged image
-            self.main_window.create_new_image("Aligned " + self.main_window.last_active.name, outputs['aligned_stack'])
+            self.create_new_display("Aligned " + self.main_window.last_active.name, outputs['aligned_stack'])
 
 
 class PyramidRigidAlign(MenuEntryModule):
@@ -106,10 +106,10 @@ class PyramidRigidAlign(MenuEntryModule):
         self.order_priority = 202
 
     def run(self):
-        if not self.main_window.image_requirements_met() or self.active_image_window.image_plot.image_data.ndim != 3:
+        if not self.main_window.image_requirements_met() or self.active_image_display.image_plot.image_data.ndim != 3:
             return
 
-        n = self.active_image_window.image_plot.image_data.shape[2]
+        n = self.active_image_display.image_plot.image_data.shape[2]
         pyramid_size = ["SpinInt", 0, "Pyramid size", (1, n, 1, 3)]
         crop = ["Check", 1, "Crop output", True]
         output_stack = ["Check", 2, "Output stack", True]
@@ -128,11 +128,11 @@ class PyramidRigidAlign(MenuEntryModule):
         crop = params['Crop output']
         out_stack = params['Output stack']
         out_average = params['Output average']
-        outputs = pyramid_rigid_align(self.active_image_window.image_plot.image_data, pyramid_size, crop, out_stack, out_average)
+        outputs = pyramid_rigid_align(self.active_image_display.image_plot.image_data, pyramid_size, crop, out_stack, out_average)
 
         # outputs will always have a 'cumulative_shifts' entry
         if 'averaged_stack' in outputs:  # we have an aligned stack
-            self.main_window.create_new_image("Averaged " + self.main_window.last_active.name,
+            self.create_new_display("Averaged " + self.main_window.last_active.name,
                                               outputs['averaged_stack'])
         if 'aligned_stack' in outputs:  # we have the averaged image
-            self.main_window.create_new_image("Aligned " + self.main_window.last_active.name, outputs['aligned_stack'])
+            self.create_new_display("Aligned " + self.main_window.last_active.name, outputs['aligned_stack'])
