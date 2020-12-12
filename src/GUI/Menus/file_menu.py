@@ -53,6 +53,9 @@ class FileMenu(MenuEntry):
             "*.tif);;Numpy (*.npy)")
         fpath = fpath[0]
 
+        # this is needed to make the main window update the histogram?
+        self.master.activateWindow()
+
         if fpath == "":
             return
 
