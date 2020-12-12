@@ -27,8 +27,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.modules = []
 
-        self.Children = {}
-        self._lastActive = None
+        self.children = {}
+        self._last_active_id = None
         self.dialogGeom = None
         self.last_directory = os.path.expanduser("~")
         self.application_path = application_path
@@ -55,30 +55,34 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @property
     def last_active(self) -> GUI.ImageWindow:
-        return self._lastActive
+        return self.children[self._last_active_id]
 
     @last_active.setter
-    def last_active(self, value):
-        if self._lastActive == value:
+    def last_active(self, new_id):
+        if self._last_active_id == new_id:
             return
-        if self._lastActive is not None:
-            self._lastActive.sigPlottablesChanged.disconnect()
-            self._lastActive.sigImageChanged.disconnect()
+
+        if new_id not in self.children.keys():
+            raise Exception(f"Cannot find child {new_id}")
+
+        if self._last_active_id is not None:
+            self.last_active.sigPlottablesChanged.disconnect()
+            self.last_active.sigImageChanged.disconnect()
             self.ui.infoPanel.sigItemDeleted.disconnect()
             self.ui.infoPanel.sigItemHide.disconnect()
 
-        self._lastActive = value
+        self._last_active_id = new_id
 
-        if self._lastActive is not None:
-            self._lastActive.sigPlottablesChanged.connect(self.ui.infoPanel.updateItemList)
-            self._lastActive.sigImageChanged.connect(self.ui.infoPanel.updateImageHistogram)
-            self.ui.infoPanel.sigItemDeleted.connect(self._lastActive.delete_plottable)
-            self.ui.infoPanel.sigItemHide.connect(self._lastActive.hide_plottable)
+        if self._last_active_id is not None:
+            self.last_active.sigPlottablesChanged.connect(self.ui.infoPanel.updateItemList)
+            self.last_active.sigImageChanged.connect(self.ui.infoPanel.updateImageHistogram)
+            self.ui.infoPanel.sigItemDeleted.connect(self.last_active.delete_plottable)
+            self.ui.infoPanel.sigItemHide.connect(self.last_active.hide_plottable)
 
         self.lastActiveChanged.emit(self.last_active)
 
     def image_requirements_met(self):
-        return self.last_active is not None and isinstance(self.last_active, GUI.ImageWindow)
+        return self.last_active is not None and isinstance(self.last_active, GUI.Controls.ImageDisplayWidget)
 
     def confirm_replace_peaks(self, tag):
         if tag in self.last_active.plottables:
@@ -99,7 +103,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 pref, let = divmod(pref, 27)
                 key = string.ascii_uppercase[let - 1] + key
 
-            if key not in self.Children:
+            if key not in self.children:
                 return key
             i += 1
 
@@ -156,13 +160,13 @@ class MainWindow(QtWidgets.QMainWindow):
         new_image_window.set_image_plot(image_plot)
 
         # update our records
-        self.Children[window_id] = new_image_window
+        self.children[window_id] = new_image_window
 
-        return self.Children[window_id]
+        return self.children[window_id]
 
     def remove_image(self, id):
-        if id in self.Children:
-            self.Children.pop(id)
+        if id in self.children:
+            self.children.pop(id)
 
         self.last_active = None
 
@@ -222,7 +226,7 @@ class MainWindow(QtWidgets.QMainWindow):
     # Qt function
     def closeEvent(self, event):
         # When the main window closes, we want to close all other windows
-        keys = list(self.Children.keys())  # need to make a copy
+        keys = list(self.children.keys())  # need to make a copy
         for k in keys:
-            self.Children[k].close()
+            self.children[k].close()
         super(MainWindow, self).closeEvent(event)

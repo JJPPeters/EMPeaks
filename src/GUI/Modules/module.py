@@ -94,7 +94,7 @@ class Module:
             self.active_image_window.image_plot.set_data(image, keep_view=keep_view)
 
         self.active_image_window.sigImageChanged.emit(self.active_image_window)
-        self.active_image_window.ui.imageItem.update()
+        self.active_image_window.plot_item.update()
 
     def create_or_update_scatter(self, tag, points):
         if points is None:

@@ -2,6 +2,7 @@ import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from GUI.Controls.ImageDisplay.Tabbed import ImageTabWidget
 from GUI.Controls.ImageInfoWidget import ImageInfoWidget
 from GUI.Menus import FileMenu
 
@@ -37,7 +38,7 @@ class MainWindowUi(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
 
         # create a tab widget to get in the vbox
-        self.tabWidget = QtWidgets.QTabWidget(self.centralWidget)
+        self.tabWidget = ImageTabWidget(main_window, parent=self.centralWidget)
         self.tabWidget.setTabsClosable(True)
         self.tabWidget.tabBar().setMovable(True)
         self.tabWidget.tabBar().setExpanding(True)

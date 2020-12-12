@@ -32,4 +32,4 @@
 #             image = ImagePlot(ratio)
 #             new_image_window.set_image_plot(image)
 #
-#             self.main_window.Children[image_id] = new_image_window
+#             self.main_window.children[image_id] = new_image_window

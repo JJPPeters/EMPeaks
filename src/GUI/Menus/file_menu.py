@@ -263,8 +263,9 @@ class FileMenu(MenuEntry):
 
         image_id = self.master.generate_window_id()
 
-        image_display = ImageDisplayWidget()
-        self.master.ui.tabWidget.addTab(image_display, image_id)
+        image_display = ImageDisplayWidget(title, image_id)
+        self.master.children[image_id] = image_display
+        self.master.ui.tabWidget.addTab(image_display, f"{image_id}:{title}")
 
         ti = self.master.ui.tabWidget.indexOf(image_display)
         self.master.ui.tabWidget.setCurrentIndex(ti)
@@ -344,5 +345,4 @@ class FileMenu(MenuEntry):
                     image_display.add_plottable(k, quiver_annotation)
 
         # TODO: re-implement this
-        # self.master.Children[image_id] = image_window
-        # self.master.set_console_message("Opened file \"" + title, Console.Success, image=image_window)
+        self.master.set_console_message("Opened file \"" + title, Console.Success, image=image_display)

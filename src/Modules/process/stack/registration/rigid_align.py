@@ -57,7 +57,7 @@ class RigidAlign(MenuEntryModule):
         #     newimagewindow.addPlot('y', np.arange(shifts.shape[0]), shifts[:, 1])
         #     newimagewindow.setXLabel('Slice')
         #     newimagewindow.setYLabel('Shift (pixels)')
-        #     self.main_window.Children[imageid] = newimagewindow
+        #     self.main_window.children[imageid] = newimagewindow
 
 
 class OverdeterminedRigidAlign(MenuEntryModule):

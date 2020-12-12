@@ -103,12 +103,6 @@ class ImageWindow(QtWidgets.QMainWindow):
         elif evt.key() == QtCore.Qt.Key_Right:
             self.ui.zScroll.setSliderPosition(c_slice + 1)  # index is not from 0, hence the funny business
 
-    @property
-    def image_plot(self) -> Union[ImagePlot, None]:
-        if 'Image' in self.plottables.keys():
-            return self.plottables['Image']
-        return None
-
 
 
 
@@ -151,14 +145,6 @@ class ImageWindow(QtWidgets.QMainWindow):
         self.plottables[tag].visible = visible
 
         self.ui.plot.update()
-
-    def is_plottable_visible(self, tag):
-        if tag not in self.plottables:
-            return False
-
-        visible = self.plottables[tag].visible
-
-        return visible
 
     def click_add_point(self):
         tag = 'Peaks'

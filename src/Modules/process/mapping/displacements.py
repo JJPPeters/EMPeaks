@@ -218,7 +218,7 @@ class DisplacementField(MenuEntryModule):
                 image = PolarImagePlot(angle, magnitude)
                 self.new_window.set_image_plot(image)
 
-                self.main_window.Children[im_id] = self.new_window
+                self.main_window.children[im_id] = self.new_window
 
                 self.main_window.last_active = self.new_window
                 self.main_window.ui.infoPanel.changeColMap(std_colour_maps['RPBY360'])
@@ -231,7 +231,7 @@ class DisplacementField(MenuEntryModule):
                 image = ImagePlot(magnitude)
                 self.new_window.set_image_plot(image)
 
-                self.main_window.Children[im_id] = self.new_window
+                self.main_window.children[im_id] = self.new_window
 
 
 # class DisplacementExport(MenuEntryModule):
