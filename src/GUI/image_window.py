@@ -113,38 +113,38 @@ class ImageWindow(QtWidgets.QMainWindow):
 
 
 
-    def update_cursor(self, px, py):
-        if self.image_plot is None:
-            return
-
-        intensity = None
-        if isinstance(self.image_plot, PolarImagePlot):
-            data = self.image_plot.angle_data
-            intensity = self.image_plot.magnitude_data
-        else:
-            data = self.image_plot.image_data
-            
-        sz = data.shape
-        sy = sz[0] - 1
-        sx = sz[1] - 1
-
-        xs = "%.2f" % px
-        ys = "%.2f" % py
-        
-        if data.ndim == 3:
-            pos = (int(np.clip(py, 0, sy)), int(np.clip(px, 0, sx)), self.image_plot.current_slice)
-        else:
-            pos = int(np.clip(py, 0, sy)), int(np.clip(px, 0, sx))
-
-        if np.any(np.iscomplex(data)):
-            ds = "%.2f + i%.2f" % (data[pos].real, data[pos].imag)
-        else:
-            ds = "%.2f" % data[pos]
-
-        if isinstance(self.image_plot, PolarImagePlot):
-            if np.any(np.iscomplex(data)):
-                ds += " (%.2f + i%.2f)" % (intensity[pos].real, intensity[pos].imag)
-            else:
-                ds += " (%.2f)" % intensity[pos]
-
-        # self.ui.statusLabel.setText("x, y: " + xs + ", " + ys + " = " + ds)
+    # def update_cursor(self, px, py):
+    #     if self.image_plot is None:
+    #         return
+    #
+    #     intensity = None
+    #     if isinstance(self.image_plot, PolarImagePlot):
+    #         data = self.image_plot.angle_data
+    #         intensity = self.image_plot.magnitude_data
+    #     else:
+    #         data = self.image_plot.image_data
+    #
+    #     sz = data.shape
+    #     sy = sz[0] - 1
+    #     sx = sz[1] - 1
+    #
+    #     xs = "%.2f" % px
+    #     ys = "%.2f" % py
+    #
+    #     if data.ndim == 3:
+    #         pos = (int(np.clip(py, 0, sy)), int(np.clip(px, 0, sx)), self.image_plot.current_slice)
+    #     else:
+    #         pos = int(np.clip(py, 0, sy)), int(np.clip(px, 0, sx))
+    #
+    #     if np.any(np.iscomplex(data)):
+    #         ds = "%.2f + i%.2f" % (data[pos].real, data[pos].imag)
+    #     else:
+    #         ds = "%.2f" % data[pos]
+    #
+    #     if isinstance(self.image_plot, PolarImagePlot):
+    #         if np.any(np.iscomplex(data)):
+    #             ds += " (%.2f + i%.2f)" % (intensity[pos].real, intensity[pos].imag)
+    #         else:
+    #             ds += " (%.2f)" % intensity[pos]
+    #
+    #     # self.ui.statusLabel.setText("x, y: " + xs + ", " + ys + " = " + ds)

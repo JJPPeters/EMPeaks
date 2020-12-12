@@ -68,6 +68,12 @@ class MainWindowUi(object):
 
         # create a status bar
         self.statusBar = QtWidgets.QStatusBar(main_window)
+
+        self.statusLabel = QtWidgets.QLabel(self.statusBar)
+        self.statusLabel.setText("")
+
+        self.statusBar.addWidget(self.statusLabel, 1)
+
         main_window.setStatusBar(self.statusBar)
 
     def add_menu(self, menu_list):

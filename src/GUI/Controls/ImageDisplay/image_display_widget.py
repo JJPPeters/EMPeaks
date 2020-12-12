@@ -46,13 +46,13 @@ class ImageDisplayWidget(QtWidgets.QWidget):
         #
         #
 
-        # self.plot_item.plot_view.signal_mouse_moved.connect(self.update_cursor)
+        self.plot_item.plot_view.signal_mouse_moved.connect(self.update_cursor)
 
         self.plot_item.plot_view.signal_rect_selected.connect(self.select_from_rect)
         self.plot_item.plot_view.signal_mouse_clicked.connect(self.select_from_click)
 
     @property
-    def image_plot(self) -> Union[ImagePlot, None]:
+    def image_plot(self) -> Union[PolarImagePlot, ImagePlot, None]:
         if 'Image' in self.plottables.keys():
             return self.plottables['Image']
         return None
@@ -60,11 +60,6 @@ class ImageDisplayWidget(QtWidgets.QWidget):
     # to type hint multiple types: https://stackoverflow.com/a/48709142
     def set_image_plot(self, image_plot: Union[ImagePlot, PolarImagePlot], keep_view=False):
         self.add_plottable('Image', image_plot, keep_view=keep_view)
-
-        # if image_plot.slices > 1:
-        #     self.ui.zScroll.setRange(0, image_plot.slices-1)
-        #     self.ui.zScroll.valueChanged.connect(self.set_slice)
-        #     self.ui.zScroll.setVisible(True)
 
         self.sigImageChanged.emit(self)
 
@@ -165,3 +160,39 @@ class ImageDisplayWidget(QtWidgets.QWidget):
     def set_slice(self, index, update_slider=True):
         self.plot_item.makeCurrent()
         self.image_plot.set_slice(index)
+
+    def update_cursor(self, px, py):
+        if self.image_plot is None:
+            return
+
+        intensity = None
+        if isinstance(self.image_plot, PolarImagePlot):
+            data = self.image_plot.angle_data
+            intensity = self.image_plot.magnitude_data
+        else:
+            data = self.image_plot.image_data
+
+        sz = data.shape
+        sy = sz[0] - 1
+        sx = sz[1] - 1
+
+        xs = "%.2f" % px
+        ys = "%.2f" % py
+
+        if data.ndim == 3:
+            pos = (int(np.clip(py, 0, sy)), int(np.clip(px, 0, sx)), self.image_plot.current_slice)
+        else:
+            pos = int(np.clip(py, 0, sy)), int(np.clip(px, 0, sx))
+
+        if np.any(np.iscomplex(data)):
+            ds = "%.2f + i%.2f" % (data[pos].real, data[pos].imag)
+        else:
+            ds = "%.2f" % data[pos]
+
+        if isinstance(self.image_plot, PolarImagePlot):
+            if np.any(np.iscomplex(data)):
+                ds += " (%.2f + i%.2f)" % (intensity[pos].real, intensity[pos].imag)
+            else:
+                ds += " (%.2f)" % intensity[pos]
+
+        self.main_win.ui.statusLabel.setText("x, y: " + xs + ", " + ys + " = " + ds)
