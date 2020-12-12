@@ -28,7 +28,12 @@ class ImagePlot(OglImageTechnique):
         # this is used to set the brightness, contrast and gamma of the image
         self.BCG = np.array([0.5, 0.5, 0.5])
         # this is the colour map (rgba) array!
-        self.colour_map = None
+        # self.colour_map = None
+        self.colour_map = np.zeros((256, 4), dtype=np.int32)
+        self.colour_map[:, 0] = np.linspace(0, 255, 256)
+        self.colour_map[:, 1] = np.linspace(0, 255, 256)
+        self.colour_map[:, 2] = np.linspace(0, 255, 256)
+        self.colour_map[:, 3] = 255
 
         self.current_slice = 0
 

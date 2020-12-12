@@ -14,7 +14,6 @@ class ColMapHistogramItem(QtWidgets.QWidget):
         super(ColMapHistogramItem, self).__init__()
 
         self.image = None
-        self.lut = None
         self.currentXrange = None
 
         self.bins = 128
@@ -69,9 +68,13 @@ class ColMapHistogramItem(QtWidgets.QWidget):
     def setImage(self, img):
         self.image = img  # TODO: check that this just holds a reference, not a copy?
         if self.image is not None and self.image.image_plot is not None:
+            # self.image.image_plot.set_colour_map(self.getLookupTable())
+
             if img.image_plot.colour_map is not None:
                 self.changeColmap(img.image_plot.colour_map)
-            # self.image.image_plot.set_colour_map(self.getLookupTable())
+            # else:
+            #     raise Exception("Image does not have a colourmap defined")
+
             self.vb.axHistory = self.image.image_plot.limitsHistory
             self.applyHistogramHistory()
 
@@ -145,22 +148,12 @@ class ColMapHistogramItem(QtWidgets.QWidget):
 
         self.vb.update()
 
-    # def gradientChanged(self):
-        # if self.image is not None and self.image.image_plot is not None:
-            # send function pointer, not the result
-            # self.image.image_plot.set_colour_map(self.getLookupTable(original=True))
-
-        # self.lut = None
-        # # self.sigLookupTableChanged.emit(self)
-        # return
-
     def getLookupTable(self, img=None, n=None, alpha=True, original=False):
         if n is None:
             n = 256
 
-        if self.lut is None:
-            self.lut = self.gradient.getLookupTable(n, alpha=alpha, original=original)
-        return self.lut
+        lut = self.gradient.getLookupTable(n, alpha=alpha, original=original)
+        return lut
 
     def changeColmap(self, cmap):
         if self.image is not None and self.image.image_plot is not None:
@@ -168,8 +161,6 @@ class ColMapHistogramItem(QtWidgets.QWidget):
             self.staticGradient.changeColmap(cmap)
 
             self.image.image_plot.set_colour_map(self.getLookupTable(original=True))
-
-        self.lut = None
 
     def complexImageChanged(self, complex_type):
         if self.image is not None and self.image.image_plot is not None:
