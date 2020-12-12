@@ -80,7 +80,7 @@ class ColMapHistogramItem(QtWidgets.QWidget):
 
     def applyHistogramHistory(self):
         self.vb.makeCurrent()
-        self.image.limitsHistory = self.vb.axHistory  # update the limits history
+        self.image.image_plot.limitsHistory = self.vb.axHistory  # update the limits history
 
         intens = self.image.image_plot.intensities
 
@@ -92,7 +92,7 @@ class ColMapHistogramItem(QtWidgets.QWidget):
             hist_sample = get_grid_sample_spacing(intens, sample_factor)
 
         r = np.array([np.min(hist_sample), np.max(hist_sample)])
-        for h in self.image.limitsHistory:
+        for h in self.image.image_plot.limitsHistory:
             h_range = np.array(h)
 
             r_r = r[1] - r[0]

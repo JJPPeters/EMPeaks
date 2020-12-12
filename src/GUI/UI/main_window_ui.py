@@ -19,7 +19,7 @@ class MainWindowUi(object):
 
         # make fixed window, might allow resizing later
         # windows is very simple, so resizing not really needed atm
-        # main_window.setFixedSize(700, 550)
+        main_window.setMinimumSize(700, 550)
 
         # make a generic central widget
         self.centralWidget = QtWidgets.QWidget(main_window)
