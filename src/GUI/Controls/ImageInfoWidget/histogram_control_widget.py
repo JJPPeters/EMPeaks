@@ -30,6 +30,9 @@ class HistogramControlWidget(QtWidgets.QWidget):
         self.slider_contrast = SlideControlWidget(self, name="Contrast", min=0, max=100, default=50, scale=0.01)
         self.slider_gamma = SlideControlWidget(self, name="Gamma", min=0, max=100, default=50, scale=0.01)
 
+        self.slider_z = SlideControlWidget(self, name="Slice", min=0, max=100, default=0, scale=1)
+        self.slider_z.setVisible(False)
+
         self.combo_complex = QtWidgets.QComboBox(self)
         self.combo_complex.addItems(["Real", "Imaginary", "Amplitude", "Phase", "Power spectrum"])
         # self.combo_complex.setVisible(False)
@@ -42,11 +45,14 @@ class HistogramControlWidget(QtWidgets.QWidget):
         self.verticalLayout.addWidget(self.slider_brightness)
         self.verticalLayout.addWidget(self.slider_contrast)
         self.verticalLayout.addWidget(self.slider_gamma)
+        self.verticalLayout.addWidget(self.slider_z)
 
         # connect the sliders to the slots that update stuff :)
         self.slider_brightness.valueChanged.connect(self.brightnessChanged)
         self.slider_contrast.valueChanged.connect(self.contrastChanged)
         self.slider_gamma.valueChanged.connect(self.gammaChanged)
+        self.slider_z.valueChanged.connect(self.sliceChanged)
+
         self.combo_complex.currentIndexChanged.connect(self.complexDisplayChanged)
 
     def setImage(self, image):
@@ -54,6 +60,13 @@ class HistogramControlWidget(QtWidgets.QWidget):
 
         if image is None:
             return
+
+        if image.image_plot.slices > 1:
+            self.slider_z.setVisible(True)
+            self.slider_z.set_limits(0, image.image_plot.slices-1)
+            self.slider_z.setVal(image.image_plot.current_slice)
+        else:
+            self.slider_z.setVisible(False)
 
         bcg = self.bar.image.image_plot.BCG
 
@@ -100,6 +113,10 @@ class HistogramControlWidget(QtWidgets.QWidget):
         self.G = value
         if update:
             self.bar.updateBCG(self.B, self.C, self.G)
+
+    # Slot
+    def sliceChanged(self, value):
+        self.bar.image.image_plot.set_slice(int(value))
 
     def changeColmap(self, cmap):
         self.bar.changeColmap(cmap)

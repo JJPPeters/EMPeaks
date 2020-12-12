@@ -160,4 +160,8 @@ class ImageDisplayWidget(QtWidgets.QWidget):
 
             if self.plottables[tag].points.size == 0:
                 self.delete_plottable(tag)
-                self.ui.plot.update()
+                self.plot_item.update()
+
+    def set_slice(self, index, update_slider=True):
+        self.plot_item.makeCurrent()
+        self.image_plot.set_slice(index)

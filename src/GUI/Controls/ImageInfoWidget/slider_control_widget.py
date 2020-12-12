@@ -67,9 +67,16 @@ class SlideControlWidget(QtWidgets.QWidget):
         # only reset the value, this will cause the slider to emit it's value changed signal
         self.slider.setValue(val)
 
+    def set_limits(self, low, high):
+        self.slider.setMinimum(low)
+        self.slider.setMaximum(high)
+
     def on_slider_valueChanged(self, value):
         val = value * self.scale
-        self.lbl_val.setText("%.2f" % val)
+        if type(self.scale) == int:
+            self.lbl_val.setText("%d" % val)
+        else:
+            self.lbl_val.setText("%.2f" % val)
 
         # emit out own signal, as we want the scaled value
         self.valueChanged.emit(val)
