@@ -40,6 +40,7 @@ class SlideControlWidget(QtWidgets.QWidget):
         self.slider = QtWidgets.QSlider(self)
         self.slider.setMinimum(min)
         self.slider.setMaximum(max)
+        self.slider.setValue(default)
         self.slider.setOrientation(QtCore.Qt.Horizontal)
         self.slider.setObjectName("slider")
 
@@ -57,7 +58,8 @@ class SlideControlWidget(QtWidgets.QWidget):
 
         # IMPORTANT: needs to be set after the signals have been connected to make the label update when the widget
         # is created
-        self.slider.setProperty("value", default)
+        # self.slider.setProperty("value", default)
+        self.on_slider_valueChanged(default)
 
     def resetVal(self):
         # only reset the value, this will cause the slider to emit it's value changed signal
