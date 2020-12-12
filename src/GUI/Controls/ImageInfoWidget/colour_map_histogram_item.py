@@ -165,4 +165,5 @@ class ColMapHistogramItem(QtWidgets.QWidget):
     def complexImageChanged(self, complex_type):
         if self.image is not None and self.image.image_plot is not None:
             self.image.image_plot.set_complex_type(complex_type)
+            self.applyHistogramHistory()
             # TODO: reset the limits and the BCG (or leave them but they need to be applied)

@@ -103,6 +103,7 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
     def undo_action(self):
         if self.preserve_image and self.origData is not None:
             self.master.image_plot.set_data(self.origData)
+            self.master.sigImageChanged.emit(self.master)
 
         tag = 'Peaks'
 

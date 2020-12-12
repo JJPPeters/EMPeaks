@@ -130,4 +130,7 @@ class Module:
         image_plot = ImagePlot(data)
         image_display.set_image_plot(image_plot)
 
+        # TODO: this is a bodge but sometimes the histogram does not update!
+        self.main_window.ui.infoPanel.colMapHistogram.bar.vb.update()
+
         return image_display
