@@ -72,8 +72,8 @@ class ColMapHistogramItem(QtWidgets.QWidget):
 
             if img.image_plot.colour_map is not None:
                 self.changeColmap(img.image_plot.colour_map)
-            # else:
-            #     raise Exception("Image does not have a colourmap defined")
+            else:
+                raise Exception("Image does not have a colourmap defined")
 
             self.vb.axHistory = self.image.image_plot.limitsHistory
             self.applyHistogramHistory()
