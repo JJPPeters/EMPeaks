@@ -18,24 +18,40 @@ class MainWindowUi(object):
 
         # make fixed window, might allow resizing later
         # windows is very simple, so resizing not really needed atm
-        main_window.setFixedSize(700, 550)
+        # main_window.setFixedSize(700, 550)
 
         # make a generic central widget
         self.centralWidget = QtWidgets.QWidget(main_window)
-        self.centralWidget.setObjectName("centralWidget")
 
         # make our layout to hold the two main elements
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralWidget)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout.setObjectName("horizontalLayout")
 
-        # create our info widget and console
+        # create our info widget
         self.infoPanel = ImageInfoWidget(main_window)
+
+        # create a vertical layout for the main bit (with console underneath)
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralWidget)
+        self.verticalLayout.setSpacing(0)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+
+        # create a tab widget to get in the vbox
+        self.tabWidget = QtWidgets.QTabWidget(self.centralWidget)
+        self.tabWidget.setTabsClosable(True)
+        self.tabWidget.tabBar().setMovable(True)
+        self.tabWidget.tabBar().setExpanding(True)
+
+        # create the main console to go in the vbox
         self.mainConsole = self.create_console()
-        # add them
+
+        # add them to the vbox
+        self.verticalLayout.addWidget(self.tabWidget, 1)
+        self.verticalLayout.addWidget(self.mainConsole, 0)
+
+        # add them all to the horizontal layout
         self.horizontalLayout.addWidget(self.infoPanel)
-        self.horizontalLayout.addWidget(self.mainConsole)
+        self.horizontalLayout.addItem(self.verticalLayout)
 
         main_window.setCentralWidget(self.centralWidget)
 

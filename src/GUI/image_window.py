@@ -53,10 +53,10 @@ class ImageWindow(QtWidgets.QMainWindow):
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
-        self.ui.imageItem.plot_view.signal_mouse_moved.connect(self.update_cursor)
+        self.ui.plot.plot_item.plot_view.signal_mouse_moved.connect(self.update_cursor)
 
-        self.ui.imageItem.plot_view.signal_rect_selected.connect(self.select_from_rect)
-        self.ui.imageItem.plot_view.signal_mouse_clicked.connect(self.select_from_click)
+        self.ui.plot.plot_item.plot_view.signal_rect_selected.connect(self.select_from_rect)
+        self.ui.plot.plot_item.plot_view.signal_mouse_clicked.connect(self.select_from_click)
 
     def event(self, event):
         # activate this window here
@@ -109,33 +109,12 @@ class ImageWindow(QtWidgets.QMainWindow):
             return self.plottables['Image']
         return None
 
-    # to type hint multiple types: https://stackoverflow.com/a/48709142
-    def set_image_plot(self, image_plot: Union[ImagePlot, PolarImagePlot], keep_view=False):
-        self.add_plottable('Image', image_plot, keep_view=keep_view)
 
-        if image_plot.slices > 1:
-            self.ui.zScroll.setRange(0, image_plot.slices-1)
-            self.ui.zScroll.valueChanged.connect(self.set_slice)
-            self.ui.zScroll.setVisible(True)
 
-        self.sigImageChanged.emit(self)
 
-    def add_plottable(self, tag, entry, keep_view=True, update=True):
-        if not self.isVisible():
-            raise Exception("Must show window before plotting OpenGL elements")
-
-        if tag in self.plottables:
-            self.ui.imageItem.plot_view.remove_widget(self.plottables[tag])
-        self.plottables[tag] = entry  # I think this destroys the old object!
-
-        self.ui.imageItem.plot_view.add_widget(self.plottables[tag], fit=not keep_view)
-        if update:
-            self.ui.imageItem.update()
-
-        self.sigPlottablesChanged.emit(self)
 
     def set_slice(self, index, update_slider=True):
-        self.ui.imageItem.makeCurrent()
+        self.ui.plot.makeCurrent()
         self.image_plot.set_slice(index)
 
     def delete_plottable(self, tag, update=True):
@@ -147,18 +126,18 @@ class ImageWindow(QtWidgets.QMainWindow):
         i = None
 
         if tagType == AnnotationType.Scatter:
-            i = self.ui.imageItem.plot_view.remove_widget(self.plottables[tag])
+            i = self.ui.plot.plot_view.remove_widget(self.plottables[tag])
             del self.plottables[tag]
 
         if tagType == AnnotationType.Quiver:
-            i = self.ui.imageItem.plot_view.remove_widget(self.plottables[tag])
+            i = self.ui.plot.plot_view.remove_widget(self.plottables[tag])
             del self.plottables[tag]
 
         if tagType == AnnotationType.Basis:
-            i = self.ui.imageItem.plot_view.remove_widget(self.plottables[tag])
+            i = self.ui.plot.plot_view.remove_widget(self.plottables[tag])
             del self.plottables[tag]
 
-        self.ui.imageItem.update()
+        self.ui.plot.update()
 
         if update:
             self.sigPlottablesChanged.emit(self)
@@ -171,7 +150,7 @@ class ImageWindow(QtWidgets.QMainWindow):
 
         self.plottables[tag].visible = visible
 
-        self.ui.imageItem.update()
+        self.ui.plot.update()
 
     def is_plottable_visible(self, tag):
         if tag not in self.plottables:
@@ -191,16 +170,16 @@ class ImageWindow(QtWidgets.QMainWindow):
             raise Exception("Trying to add points to non scatter plot")
 
         # connect the signal 'click' from the plot to the scatter
-        self.ui.imageItem.plot_view.signal_mouse_clicked.disconnect(self.select_from_click)
-        self.ui.imageItem.plot_view.signal_mouse_clicked.connect(self.add_point_from_click)
+        self.ui.plot.plot_view.signal_mouse_clicked.disconnect(self.select_from_click)
+        self.ui.plot.plot_view.signal_mouse_clicked.connect(self.add_point_from_click)
 
     def add_point_from_click(self, px, py, modifier, tag='Peaks'):
 
         self.plottables[tag].add_point(px, py)
 
         if modifier != QtCore.Qt.ShiftModifier:
-            self.ui.imageItem.plot_view.signal_mouse_clicked.disconnect(self.add_point_from_click)
-            self.ui.imageItem.plot_view.signal_mouse_clicked.connect(self.select_from_click)
+            self.ui.plot.plot_view.signal_mouse_clicked.disconnect(self.add_point_from_click)
+            self.ui.plot.plot_view.signal_mouse_clicked.connect(self.select_from_click)
 
     def select_from_click(self, px, py, modifier, tag='Peaks'):
         if tag in self.plottables.keys():
@@ -216,7 +195,7 @@ class ImageWindow(QtWidgets.QMainWindow):
 
             if self.plottables[tag].points.size == 0:
                 self.delete_plottable(tag)
-                self.ui.imageItem.update()
+                self.ui.plot.update()
 
     def update_cursor(self, px, py):
         if self.image_plot is None:
@@ -252,4 +231,4 @@ class ImageWindow(QtWidgets.QMainWindow):
             else:
                 ds += " (%.2f)" % intensity[pos]
 
-        self.ui.statusLabel.setText("x, y: " + xs + ", " + ys + " = " + ds)
+        # self.ui.statusLabel.setText("x, y: " + xs + ", " + ys + " = " + ds)

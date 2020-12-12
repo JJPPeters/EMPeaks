@@ -26,6 +26,8 @@ from Processing.Image import rgb_array_to_greyscale
 
 import imageio
 
+from GUI.Controls import ImageDisplayWidget
+
 
 class FileMenu(MenuEntry):
     def __init__(self, master, parent_menu):
@@ -260,8 +262,17 @@ class FileMenu(MenuEntry):
     def process_open_dict(self, in_dict, title):
 
         image_id = self.master.generate_window_id()
-        image_window = GUI.ImageWindow(title, image_id, master=self.master)
-        image_window.show()
+
+        image_display = ImageDisplayWidget()
+        self.master.ui.tabWidget.addTab(image_display, image_id)
+
+        ti = self.master.ui.tabWidget.indexOf(image_display)
+        self.master.ui.tabWidget.setCurrentIndex(ti)
+
+        # image_window = GUI.ImageWindow(title, image_id, master=self.master)
+        # image_window.show()
+
+        # image_display = image_window.ui.plot
 
         for key, val in in_dict.items():
             if key == 'images':
@@ -272,7 +283,7 @@ class FileMenu(MenuEntry):
 
                     # create our image plottable
                     image_plot = ImagePlot(v['magnitude'], visible=visible)
-                    image_window.set_image_plot(image_plot)
+                    image_display.set_image_plot(image_plot)
 
             if key == 'polar_images':
                 for k, v in val.items():
@@ -282,7 +293,7 @@ class FileMenu(MenuEntry):
 
                     # create our image plottable
                     image_plot = PolarImagePlot(angle=v['angle'], magnitude=v['magnitude'], visible=visible)
-                    image_window.set_image_plot(image_plot)
+                    image_display.set_image_plot(image_plot)
 
             if key == 'peaks':
                 for k, v in val.items():
@@ -296,7 +307,7 @@ class FileMenu(MenuEntry):
                                           size=10,
                                           visible=visible,
                                           fill_colour=np.array(next(self.master.scatter_cols)) / 255)
-                    image_window.add_plottable(k, scatter)
+                    image_display.add_plottable(k, scatter)
 
             if key == 'bases':
                 for k, v in val.items():
@@ -312,10 +323,10 @@ class FileMenu(MenuEntry):
                         visible = v['visible']
 
                     # now need to create the drawn basis object?
-                    basis_annotation = Basis(image_window.ui.imageItem, basis=basis)
+                    basis_annotation = Basis(image_display.plot, basis=basis)
                     basis_annotation.visible = visible
 
-                    image_window.add_plottable(k, basis_annotation)
+                    image_display.add_plottable(k, basis_annotation)
 
             if key == 'quivers':
                 for k, v in val.items():
@@ -330,8 +341,8 @@ class FileMenu(MenuEntry):
 
                     quiver_annotation = QuiverPlot(pos, mag, ang, visible=visible, scale=sc)
 
-                    image_window.add_plottable(k, quiver_annotation)
+                    image_display.add_plottable(k, quiver_annotation)
 
-        self.master.Children[image_id] = image_window
-        self.master.set_console_message("Opened file \"" + title, Console.Success,
-                                        image=image_window)
+        # TODO: re-implement this
+        # self.master.Children[image_id] = image_window
+        # self.master.set_console_message("Opened file \"" + title, Console.Success, image=image_window)
