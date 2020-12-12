@@ -9,7 +9,17 @@ class ImageTabWidget(QtWidgets.QTabWidget):
 
         self.currentChanged.connect(self.set_tab_as_active)
 
-    def set_tab_as_active(self, i):
-        id = self.currentWidget().id
+        self.tabCloseRequested.connect(self.close_tab)
+
+    def set_tab_as_active(self, index):
+        if index == -1:
+            id = None
+        else:
+            id = self.widget(index).id
 
         self.main_window.last_active = id
+
+    def close_tab(self, index):
+        id = self.widget(index).id
+        self.main_window.remove_image(id)
+        self.removeTab(index)

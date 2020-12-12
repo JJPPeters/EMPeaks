@@ -3,6 +3,7 @@ import string
 import sys
 import traceback
 from itertools import cycle
+from typing import Optional
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -54,15 +55,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.lastActiveChanged.connect(self.ui.infoPanel.showImageInfo)
 
     @property
-    def last_active(self) -> GUI.ImageWindow:
-        return self.children[self._last_active_id]
+    def last_active(self) -> Optional[GUI.ImageWindow]:
+        if self._last_active_id in self.children:
+            return self.children[self._last_active_id]
+        else:
+            return None
 
     @last_active.setter
     def last_active(self, new_id):
         if self._last_active_id == new_id:
             return
 
-        if new_id not in self.children.keys():
+        if new_id is not None and new_id not in self.children.keys():
             raise Exception(f"Cannot find child {new_id}")
 
         if self._last_active_id is not None:
@@ -150,10 +154,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.default_except_hook(t, val, tb)  # this lets the console show the message too
 
     def remove_image(self, id):
+        self.last_active = None
+
         if id in self.children:
             self.children.pop(id)
-
-        self.last_active = None
 
     def set_console_message(self, message, message_type=Console.Message, image=None, show_id=True, bold=False,
                             end_new_line=True):
