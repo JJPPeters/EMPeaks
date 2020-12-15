@@ -14,6 +14,10 @@ if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
 if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 
+# this is critical for having the image tabs movable to new windows (if we are using the tabbed way of showing images)
+if hasattr(QtCore.Qt, 'AA_ShareOpenGLContexts'):
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts, True)
+
 
 def main():
     #

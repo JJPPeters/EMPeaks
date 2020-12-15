@@ -40,14 +40,35 @@ class MainWindowUi(object):
         # create a tab widget to get in the vbox
         self.tabWidget = ImageTabWidget(main_window, parent=self.centralWidget)
         self.tabWidget.setTabsClosable(True)
-        self.tabWidget.tabBar().setMovable(True)
-        self.tabWidget.tabBar().setExpanding(True)
+        # self.tabWidget.tabBar().setMovable(True)
+        # self.tabWidget.tabBar().setExpanding(True)
+        self.tabWidget.tabBar.setMovable(True)
+        self.tabWidget.tabBar.setExpanding(True)
+
+
+
+
+
+
+
+
+        self.tabWidget2 = ImageTabWidget(main_window, parent=self.centralWidget)
+        self.tabWidget2.setTabsClosable(True)
+        self.tabWidget2.tabBar.setMovable(True)
+        self.tabWidget2.tabBar.setExpanding(True)
+
+
+
+
+
+
 
         # create the main console to go in the vbox
         self.mainConsole = self.create_console()
 
         # add them to the vbox
         self.verticalLayout.addWidget(self.tabWidget, 1)
+        self.verticalLayout.addWidget(self.tabWidget2, 1)
         self.verticalLayout.addWidget(self.mainConsole, 0)
 
         # add them all to the horizontal layout
