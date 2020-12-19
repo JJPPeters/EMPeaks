@@ -39,11 +39,7 @@ class MainWindowUi(object):
 
         # create a tab widget to get in the vbox
         self.tabWidget = ImageTabWidget(main_window, parent=self.centralWidget)
-        self.tabWidget.setTabsClosable(True)
-        # self.tabWidget.tabBar().setMovable(True)
-        # self.tabWidget.tabBar().setExpanding(True)
-        self.tabWidget.tabBar.setMovable(True)
-        self.tabWidget.tabBar.setExpanding(True)
+
 
 
 
@@ -53,9 +49,6 @@ class MainWindowUi(object):
 
 
         self.tabWidget2 = ImageTabWidget(main_window, parent=self.centralWidget)
-        self.tabWidget2.setTabsClosable(True)
-        self.tabWidget2.tabBar.setMovable(True)
-        self.tabWidget2.tabBar.setExpanding(True)
 
 
 
