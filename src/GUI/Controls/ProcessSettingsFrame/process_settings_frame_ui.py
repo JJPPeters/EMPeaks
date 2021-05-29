@@ -192,3 +192,59 @@ class ProcessSettingsFrameUi(object):
         check_box.stateChanged.connect(self.filter_widget.on_control_changed)
 
         return check_box
+
+    def add_get_file_box(self, name="Open file", path='C:\\', extensions=''):
+        _name = name + ":"
+        v_control_layout = QtWidgets.QVBoxLayout()
+        lbl_file_box = QtWidgets.QLabel(self.filter_widget)
+        lbl_file_box.setText(_name)
+        v_control_layout.addWidget(lbl_file_box)
+
+        btn_open = QtWidgets.QPushButton(self.filter_widget)
+        btn_open.setText('Open file')
+        v_control_layout.addWidget(btn_open)
+
+        path_edit = QtWidgets.QLineEdit(self.filter_widget)
+        path_edit.setText(path)
+        path_edit.setReadOnly(True)
+        v_control_layout.addWidget(path_edit)
+
+        self.vert_control_layout.addLayout(v_control_layout)
+
+        def get_file_path_from_dlg(cntrl):
+            fpath = QtWidgets.QFileDialog.getOpenFileName(
+                self.filter_widget, name, self.filter_widget.master.master.last_directory, extensions)
+            fpath = fpath[0]
+
+            path_edit.setText(fpath)
+
+        btn_open.clicked.connect(get_file_path_from_dlg)
+
+        path_edit.textChanged.connect(self.filter_widget.on_control_changed)
+        # triggers at end of changing
+        # path_edit.editingFinished.connect(self.filter_widget.on_control_changed)
+        # doesnt trigger when changed programatically
+        # path_edit.textEdited.connect(self.filter_widget.on_control_changed)
+
+        return path_edit
+
+    def add_edit_box(self, name="Open file", text='-'):
+        _name = name + ":"
+        v_control_layout = QtWidgets.QVBoxLayout()
+        lbl_file_box = QtWidgets.QLabel(self.filter_widget)
+        lbl_file_box.setText(_name)
+        v_control_layout.addWidget(lbl_file_box)
+
+        line_edit = QtWidgets.QLineEdit(self.filter_widget)
+        line_edit.setText(text)
+        v_control_layout.addWidget(line_edit)
+
+        self.vert_control_layout.addLayout(v_control_layout)
+
+        line_edit.textChanged.connect(self.filter_widget.on_control_changed)
+        # triggers at end of changing
+        # path_edit.editingFinished.connect(self.filter_widget.on_control_changed)
+        # doesnt trigger when changed programatically
+        # path_edit.textEdited.connect(self.filter_widget.on_control_changed)
+
+        return line_edit

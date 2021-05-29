@@ -65,6 +65,13 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
             elif v[0] == "Check":
                 self.controls[v[2]] = self.ui.add_check_box(name=v[2],
                                                             checked=v[3])
+            elif v[0] == "FileBox":
+                self.controls[v[2]] = self.ui.add_get_file_box(name=v[2],
+                                                               path=v[3][0],
+                                                               extensions=v[3][1])
+            elif v[0] == "EditBox":
+                self.controls[v[2]] = self.ui.add_edit_box(name=v[2],
+                                                           text=v[3])
             elif v[0] == "Slider":
                 return
 
@@ -85,6 +92,8 @@ class ProcessSettingsFrame(QtWidgets.QWidget):
                 control_values[key] = value.currentText()
             elif isinstance(value, QtWidgets.QCheckBox):
                 control_values[key] = value.isChecked()
+            elif isinstance(value, QtWidgets.QLineEdit):
+                control_values[key] = value.text()
             elif isinstance(value, QtWidgets.QListWidget):
                 # remembering that we want checked items, NOT selected ones
                 checked_items = []
