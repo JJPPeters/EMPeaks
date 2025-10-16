@@ -1,0 +1,27 @@
+[project]
+name = "empeaks"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Jonathan Peters",email = "jonathanjppeters@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.8,<3.9"
+dependencies = [
+    "pyqt5 (==5.14.2)",
+    "numpy (==1.23)",
+    "tifffile (==2020.12.8)",
+    "imageio (==2.9)",
+    "h5py (==3.1)",
+    "scipy (==1.6)",
+    "pyopengl (==3.1.10)",
+    "scikit-image (==0.17.1)",
+    "scikit-learn (==0.23.1)",
+    "lmfit (==1.0.1)",
+    "cython (>=3.1.4,<4.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

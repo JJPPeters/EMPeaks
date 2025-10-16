@@ -20,7 +20,7 @@ def refine_generic(data, float_points, refine_func, r=1, lim=1, *refine_args, **
     # convenience
     sz = points.shape[0]
     # create arrays for output, 'bad' points will be removed later
-    out_xy = np.zeros(shape=(sz, 2), dtype='Float64')  # xy
+    out_xy = np.zeros(shape=(sz, 2), dtype=np.float64)  # xy
     # to use for determining edges
     dim = data.shape
     # to be filled with index of points to remove (i.e. close to edge)
