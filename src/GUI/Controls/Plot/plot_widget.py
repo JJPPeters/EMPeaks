@@ -284,7 +284,7 @@ class PlotWidget(GLPlotWidget):
                         technique.render(projection, o_w/pr, o_h/pr, ratio)
             else:
                 for technique in self.plot_view.widgets:
-                    technique.render(projection, o_w/pr, o_h/pr, ratio)
+                    technique.render(projection, o_w//pr, o_h//pr, ratio)
         else:
             gl.glViewport(0, 0, o_w, o_h)
             ratio = (scale, scale)
